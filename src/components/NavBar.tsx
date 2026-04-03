@@ -48,9 +48,12 @@ export function NavBar({
     <header className="bg-gradient-to-r from-green-800 via-green-700 to-green-800 sticky top-0 z-50 shadow-lg border-b-2 border-green-900/30">
       <div className="container mx-auto px-4 max-w-7xl flex h-12 items-center justify-between">
         <div className="flex items-center gap-4 sm:gap-6">
-          <Link href="/collection" className="flex items-center gap-1.5">
-            <span className="font-black text-lg tracking-tighter text-yellow-300 drop-shadow">GPK</span>
-            <span className="font-bold text-lg tracking-tight text-white/90">VAULT</span>
+          <Link href="/collection">
+            <img
+              src="/logo.png"
+              alt="GPK Vault"
+              className="h-9 drop-shadow"
+            />
           </Link>
 
           {/* Desktop nav */}

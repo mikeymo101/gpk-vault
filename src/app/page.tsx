@@ -16,17 +16,13 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Green Banner — tab shape */}
-          <div className="mx-auto mt-3 w-[85%] rounded-t-[16px] bg-gradient-to-b from-[#5a8a4a] to-[#4a7a3a] px-6 pt-4 pb-3 text-center shadow-md relative">
-            <h1
-              className="text-[42px] leading-none font-black text-white drop-shadow-[0_2px_3px_rgba(0,0,0,0.35)]"
-              style={{ fontFamily: "'Georgia', 'Times New Roman', serif", fontStyle: "italic" }}
-            >
-              GPK Vault
-            </h1>
-            <p className="text-[8px] font-bold tracking-[0.2em] uppercase text-[#c5d8a8] mt-1">
-              Garbage Pail Kids Collection Tracker
-            </p>
+          {/* Logo Banner */}
+          <div className="mx-auto mt-3 px-4 text-center">
+            <img
+              src="/logo.png"
+              alt="GPK Vault — Garbage Pail Kids Collection Tracker"
+              className="w-full max-w-[340px] mx-auto drop-shadow-lg"
+            />
           </div>
 
           {/* Card Body */}

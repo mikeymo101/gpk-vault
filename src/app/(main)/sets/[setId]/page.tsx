@@ -67,19 +67,13 @@ export default async function SetDetailPage({
     <div className="space-y-6">
       {/* Card-back styled header */}
       <div className="gpk-card-back rounded-xl overflow-hidden shadow-xl border-4 border-amber-800/30">
-        {/* Green GPK Banner */}
+        {/* GPK Banner */}
         <div className="bg-gradient-to-r from-green-700 via-green-600 to-green-700 px-4 sm:px-6 py-3 text-center relative overflow-hidden">
-          {/* Decorative stars */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-1 left-4 text-yellow-300 text-lg">*</div>
-            <div className="absolute top-2 right-8 text-yellow-300 text-sm">*</div>
-            <div className="absolute bottom-1 left-1/4 text-yellow-300 text-xs">*</div>
-            <div className="absolute bottom-0 right-1/3 text-yellow-300 text-lg">*</div>
-          </div>
-
-          <p className="text-[10px] sm:text-xs font-bold tracking-[0.3em] uppercase text-green-200/80">
-            Garbage Pail Kids
-          </p>
+          <img
+            src="/logo.png"
+            alt="GPK Vault"
+            className="h-8 sm:h-10 mx-auto mb-1 drop-shadow"
+          />
           <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight drop-shadow-md">
             {set.name}
           </h1>
