@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <defs>
+    <style>
+      .icon { fill: #8a7a60; opacity: 0.13; }
+    </style>
+  </defs>
+
+  <!-- Row 1 -->
+  <!-- Trash can -->
+  <g transform="translate(10, 10) scale(0.7)">
+    <path class="icon" d="M8 4h2V2h12v2h2v2H8V4zm1 4h14l-1.5 20H10.5L9 8zm4 2v14h1V10h-1zm3 0v14h1V10h-1z"/>
+  </g>
+
+  <!-- Skull -->
+  <g transform="translate(70, 15) scale(0.7)">
+    <path class="icon" d="M16 2C9.4 2 4 6.5 4 12c0 3.5 2 6.5 5 8v3h2v-2h2v2h2v-2h2v2h2v-3c3-1.5 5-4.5 5-8 0-5.5-5.4-10-12-10zM10 14a2 2 0 110-4 2 2 0 010 4zm8 0a2 2 0 110-4 2 2 0 010 4zm-4 4c-1.7 0-3-0.5-3-1h6c0 0.5-1.3 1-3 1z"/>
+  </g>
+
+  <!-- Bone -->
+  <g transform="translate(130, 8) scale(0.65)">
+    <path class="icon" d="M7 4a3 3 0 00-3 3 3 3 0 001.5 2.6L3.2 18.4A3 3 0 004 24a3 3 0 003-1.5A3 3 0 0010 24a3 3 0 001.8-5.6L14.2 9.6A3 3 0 0016 7a3 3 0 00-3-3 3 3 0 00-2.6 1.5A3 3 0 007 4z" transform="rotate(35, 12, 14)"/>
+  </g>
+
+  <!-- Eyeball -->
+  <g transform="translate(175, 20) scale(0.6)">
+    <path class="icon" d="M12 4C6 4 1 12 1 12s5 8 11 8 11-8 11-8-5-8-11-8zm0 13a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"/>
+  </g>
+
+  <!-- Row 2 -->
+  <!-- Slime splat -->
+  <g transform="translate(40, 55) scale(0.7)">
+    <path class="icon" d="M12 2c-1 4-5 5-5 9a5 5 0 003 4.5c-1 .5-2 2-2 3.5a3 3 0 006 0c0-1-.3-2-1-2.5A5 5 0 0017 11c0-4-4-5-5-9z"/>
+  </g>
+
+  <!-- Star -->
+  <g transform="translate(105, 50) scale(0.65)">
+    <path class="icon" d="M12 1l3.09 6.26L22 8.27l-5 4.87L18.18 20 12 16.77 5.82 20 7 13.14 2 8.27l6.91-1.01L12 1z"/>
+  </g>
+
+  <!-- Worm -->
+  <g transform="translate(160, 55) scale(0.65)">
+    <path class="icon" d="M4 16c0-2 1.5-3.5 3-4 0-2.5 2-4.5 4.5-4.5S16 9.5 16 12c1.5.5 3 2 3 4 0 2.5-2 4-4 4H8c-2 0-4-1.5-4-4zm7.5-6a1 1 0 100 2 1 1 0 000-2zm3 1a1 1 0 100 2 1 1 0 000-2z"/>
+  </g>
+
+  <!-- Row 3 -->
+  <!-- Lightning bolt -->
+  <g transform="translate(5, 100) scale(0.65)">
+    <path class="icon" d="M13 1L6 14h4l-1 9 7-13h-4z"/>
+  </g>
+
+  <!-- Trash can (rotated) -->
+  <g transform="translate(65, 105) scale(0.6) rotate(10, 12, 12)">
+    <path class="icon" d="M8 4h2V2h12v2h2v2H8V4zm1 4h14l-1.5 20H10.5L9 8zm4 2v14h1V10h-1zm3 0v14h1V10h-1z"/>
+  </g>
+
+  <!-- Heart with X -->
+  <g transform="translate(125, 98) scale(0.65)">
+    <path class="icon" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    <path class="icon" d="M8.5 8l7 7m0-7l-7 7" stroke="#8a7a60" stroke-width="1.5" fill="none" opacity="0.15"/>
+  </g>
+
+  <!-- Splat -->
+  <g transform="translate(180, 105) scale(0.6)">
+    <path class="icon" d="M12 2C10 6 6 7 6 11c0 3 2 5 4 5.5C9 17 8 18.5 8 20a4 4 0 008 0c0-1.5-1-3-2-3.5 2-.5 4-2.5 4-5.5 0-4-4-5-6-9z"/>
+  </g>
+
+  <!-- Row 4 -->
+  <!-- Skull small -->
+  <g transform="translate(30, 150) scale(0.55)">
+    <path class="icon" d="M16 2C9.4 2 4 6.5 4 12c0 3.5 2 6.5 5 8v3h2v-2h2v2h2v-2h2v2h2v-3c3-1.5 5-4.5 5-8 0-5.5-5.4-10-12-10zM10 14a2 2 0 110-4 2 2 0 010 4zm8 0a2 2 0 110-4 2 2 0 010 4z"/>
+  </g>
+
+  <!-- Eyeball -->
+  <g transform="translate(90, 148) scale(0.55)">
+    <path class="icon" d="M12 4C6 4 1 12 1 12s5 8 11 8 11-8 11-8-5-8-11-8zm0 13a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"/>
+  </g>
+
+  <!-- Bone -->
+  <g transform="translate(145, 152) scale(0.55)">
+    <path class="icon" d="M7 4a3 3 0 00-3 3 3 3 0 001.5 2.6L3.2 18.4A3 3 0 004 24a3 3 0 003-1.5A3 3 0 0010 24a3 3 0 001.8-5.6L14.2 9.6A3 3 0 0016 7a3 3 0 00-3-3 3 3 0 00-2.6 1.5A3 3 0 007 4z" transform="rotate(-25, 12, 14)"/>
+  </g>
+</svg>
