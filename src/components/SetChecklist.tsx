@@ -127,8 +127,8 @@ export function SetChecklist({
   return (
     <div className="space-y-4">
       {/* Bulk actions */}
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm text-muted-foreground mr-1">Bulk:</span>
+      <div className="flex flex-wrap items-center gap-2 text-amber-900/60 dark:text-amber-200/60">
+        <span className="text-xs font-bold uppercase tracking-wide mr-1">Bulk:</span>
         <Button
           variant="outline"
           size="sm"
@@ -200,15 +200,18 @@ export function SetChecklist({
 
       {/* List view */}
       {view === "list" && (
-        <div className="border rounded-lg divide-y">
+        <div className="rounded-lg overflow-hidden">
           {cards.map((card) => {
             const entries = userCardMap[card.id] ?? [];
             const statuses = new Set(entries.map((e) => e.status));
+            const isOwned = statuses.has("have");
 
             return (
               <div
                 key={card.id}
-                className="flex items-center justify-between px-3 py-2 sm:px-4 sm:py-3 hover:bg-accent/30 transition-colors"
+                className={`gpk-checklist-row flex items-center justify-between px-2 py-1.5 sm:px-3 sm:py-2 transition-colors border-b border-amber-200/20 dark:border-amber-800/10 ${
+                  isOwned ? "bg-green-50/50 dark:bg-green-950/10" : ""
+                }`}
               >
                 <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                   <button

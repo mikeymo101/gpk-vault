@@ -128,3 +128,17 @@
     @apply font-sans;
   }
 }
+
+/* GPK Card Back styling */
+.gpk-card-back {
+  background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d4a574' fill-opacity='0.05'%3E%3Cpath d='M5 0h1L0 5V4zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Checklist row stripes for card-back feel */
+.gpk-checklist-row:nth-child(even) {
+  background-color: rgba(180, 140, 80, 0.04);
+}
+
+.gpk-checklist-row:hover {
+  background-color: rgba(180, 140, 80, 0.1) !important;
+}
