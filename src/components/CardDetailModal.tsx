@@ -111,17 +111,19 @@ export function CardDetailModal({
         </DialogTitle>
 
         {/* Card image */}
-        {card.image_url_a ? (
-          <img
-            src={card.image_url_a}
-            alt={card.name_a}
-            className="w-full max-h-[60vh] object-contain bg-black"
-          />
-        ) : (
-          <div className="w-full aspect-[3/4] bg-muted flex items-center justify-center">
-            <span className="text-muted-foreground">No image</span>
-          </div>
-        )}
+        <div className="relative bg-gradient-to-b from-black/90 to-black/70 overflow-hidden">
+          {card.image_url_a ? (
+            <img
+              src={card.image_url_a}
+              alt={card.name_a}
+              className="w-full max-h-[65vh] object-contain mx-auto drop-shadow-2xl"
+            />
+          ) : (
+            <div className="w-full aspect-[3/4] bg-muted flex items-center justify-center">
+              <span className="text-muted-foreground">No image</span>
+            </div>
+          )}
+        </div>
 
         <div className="p-4 space-y-4">
           {/* Card info */}

@@ -48,8 +48,9 @@ export function NavBar({
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container mx-auto px-4 max-w-7xl flex h-14 items-center justify-between">
         <div className="flex items-center gap-4 sm:gap-6">
-          <Link href="/collection" className="font-bold text-lg tracking-tight">
-            GPK Vault
+          <Link href="/collection" className="flex items-center gap-1.5">
+            <span className="font-black text-lg tracking-tighter text-primary">GPK</span>
+            <span className="font-bold text-lg tracking-tight">VAULT</span>
           </Link>
 
           {/* Desktop nav */}

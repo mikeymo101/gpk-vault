@@ -43,8 +43,8 @@ export default function SignupPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold tracking-tight">
-            GPK Vault
+          <CardTitle className="text-3xl font-black tracking-tighter">
+            <span className="text-primary">GPK</span> VAULT
           </CardTitle>
           <p className="text-muted-foreground mt-1">
             Create your collector account
