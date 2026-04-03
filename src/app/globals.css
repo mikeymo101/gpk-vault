@@ -131,11 +131,25 @@
 
 /* GPK Wallpaper — tiling character pattern over gradient */
 .gpk-wallpaper {
-  background-color: #b8cfab;
-  background-image: url("/gpk-pattern-tile.png"), linear-gradient(to bottom, #a8c89a, #d8ccb0);
-  background-size: 400px 400px, cover;
-  background-repeat: repeat, no-repeat;
+  position: relative;
+  background: linear-gradient(to bottom, #a8c89a, #c8c8a0, #d8ccb0);
   background-attachment: fixed;
+}
+
+.gpk-wallpaper::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("/gpk-pattern-tile.png");
+  background-size: 400px 400px;
+  background-repeat: repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.gpk-wallpaper > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Subtle version for inner pages */
