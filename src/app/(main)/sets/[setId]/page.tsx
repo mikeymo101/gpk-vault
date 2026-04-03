@@ -69,9 +69,36 @@ export default async function SetDetailPage({
       <div>
         <h1 className="text-2xl font-bold tracking-tight">{set.name}</h1>
         <p className="text-muted-foreground">
-          {set.series} &middot; {set.year} &middot; {set.total_cards} cards
+          {set.series} &middot; {set.total_cards} cards
         </p>
       </div>
+
+      {/* Set info panel */}
+      {set.description && (
+        <div className="rounded-lg border bg-card p-4 sm:p-5 space-y-3">
+          <p className="text-sm leading-relaxed">{set.description}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+            {set.release_date && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Released</p>
+                <p>{set.release_date}</p>
+              </div>
+            )}
+            {set.artists && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Artists</p>
+                <p>{set.artists}</p>
+              </div>
+            )}
+            {set.notable && (
+              <div className="sm:col-span-3">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Notable</p>
+                <p className="italic">{set.notable}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <SetChecklist
         cards={cards}

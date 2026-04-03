@@ -9,6 +9,10 @@ export type Database = {
           series: string;
           total_cards: number;
           image_url: string | null;
+          description: string | null;
+          release_date: string | null;
+          artists: string | null;
+          notable: string | null;
           created_at: string;
         };
         Insert: {
