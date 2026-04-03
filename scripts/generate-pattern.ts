@@ -5,7 +5,7 @@ import sharp from "sharp";
 import path from "path";
 
 const TILE_SIZE = 800;
-const ICON_SIZE = 60;
+const ICON_SIZE = 90;
 const ICONS_DIR = path.resolve(__dirname, "../../icons");
 const OUT = path.resolve(__dirname, "../public/gpk-pattern-tile.png");
 
@@ -100,7 +100,7 @@ async function generate() {
     const resized = await sharp(stickerBuffers[stickerIdx])
       .resize(size, size, { fit: "inside" })
       .modulate({ saturation: 0.35, brightness: 1.1 })
-      .ensureAlpha(0.3)  // 30% opacity
+      .ensureAlpha(0.15)  // 15% opacity
       .png()
       .toBuffer();
 
