@@ -129,26 +129,22 @@
   }
 }
 
-/* GPK Wallpaper — repeating GPK icon pattern */
+/* GPK Wallpaper — character pattern background */
 .gpk-wallpaper {
-  background-color: #c5b899;
-  background-image: url("/gpk-pattern.svg");
-  background-size: 200px 200px;
+  background-image: url("/gpk-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
-.dark .gpk-wallpaper,
-.gpk-wallpaper-dark {
-  background-color: #1a1814;
-  background-image: url("/gpk-pattern.svg");
-  background-size: 200px 200px;
-  filter: brightness(0.3);
-}
-
-/* Subtle version of wallpaper for inner pages */
+/* Subtle version for inner pages — fixed behind content */
 .gpk-wallpaper-subtle {
-  background-image: url("/gpk-pattern.svg");
-  background-size: 200px 200px;
-  opacity: 0.03;
+  background-image: url("/gpk-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  opacity: 0.06;
   position: fixed;
   inset: 0;
   pointer-events: none;
