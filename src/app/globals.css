@@ -129,22 +129,21 @@
   }
 }
 
-/* GPK Wallpaper — character pattern background */
+/* GPK Wallpaper — tiling character pattern over gradient */
 .gpk-wallpaper {
-  background-image: url("/gpk-bg.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background-color: #b8cfab;
+  background-image: url("/gpk-pattern-tile.png"), linear-gradient(to bottom, #a8c89a, #d8ccb0);
+  background-size: 400px 400px, cover;
+  background-repeat: repeat, no-repeat;
   background-attachment: fixed;
 }
 
-/* Subtle version for inner pages — fixed behind content */
+/* Subtle version for inner pages */
 .gpk-wallpaper-subtle {
-  background-image: url("/gpk-bg.png");
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  opacity: 0.06;
+  background-image: url("/gpk-pattern-tile.png");
+  background-size: 350px 350px;
+  background-repeat: repeat;
+  opacity: 0.04;
   position: fixed;
   inset: 0;
   pointer-events: none;
