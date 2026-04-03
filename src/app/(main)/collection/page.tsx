@@ -25,9 +25,11 @@ export default async function CollectionPage() {
   const userCards = (data ?? []) as unknown as UserCardWithDetails[];
 
   // Get collection stats
-  const haveCount = userCards.filter((uc) => uc.status === "have").length;
+  const haveCards = userCards.filter((uc) => uc.status === "have");
+  const haveCount = haveCards.length;
   const wantCount = userCards.filter((uc) => uc.status === "want").length;
   const tradeCount = userCards.filter((uc) => uc.status === "for_trade").length;
+  const dupeCount = haveCards.reduce((sum, uc) => sum + Math.max(0, uc.quantity - 1), 0);
 
   return (
     <div className="space-y-6">
@@ -41,10 +43,11 @@ export default async function CollectionPage() {
         <ExportButton userCards={userCards} />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-4 gap-4">
         <StatCard label="Have" count={haveCount} />
         <StatCard label="Want" count={wantCount} />
         <StatCard label="For Trade" count={tradeCount} />
+        <StatCard label="Dupes" count={dupeCount} />
       </div>
 
       <CollectionView userCards={userCards} />

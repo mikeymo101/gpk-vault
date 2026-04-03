@@ -151,6 +151,62 @@ export function CardDetailModal({
             })}
           </div>
 
+          {/* Quantity controls for "have" cards */}
+          {(() => {
+            const haveEntry = userEntries.find((e) => e.status === "have");
+            if (!haveEntry) return null;
+            return (
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-muted-foreground">Quantity:</span>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    disabled={isPending}
+                    onClick={async () => {
+                      const newQty = haveEntry.quantity - 1;
+                      if (newQty <= 0) {
+                        await supabase.from("user_cards").delete().eq("id", haveEntry.id);
+                      } else {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        await (supabase.from("user_cards") as any)
+                          .update({ quantity: newQty })
+                          .eq("id", haveEntry.id);
+                      }
+                      startTransition(() => { router.refresh(); });
+                    }}
+                  >
+                    -
+                  </Button>
+                  <span className="text-lg font-bold w-8 text-center">
+                    {haveEntry.quantity}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    disabled={isPending}
+                    onClick={async () => {
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      await (supabase.from("user_cards") as any)
+                        .update({ quantity: haveEntry.quantity + 1 })
+                        .eq("id", haveEntry.id);
+                      startTransition(() => { router.refresh(); });
+                    }}
+                  >
+                    +
+                  </Button>
+                </div>
+                {haveEntry.quantity > 1 && (
+                  <span className="text-xs text-muted-foreground">
+                    ({haveEntry.quantity - 1} duplicate{haveEntry.quantity > 2 ? "s" : ""})
+                  </span>
+                )}
+              </div>
+            );
+          })()}
+
           {/* Condition + Notes (only show if user has at least one status) */}
           {userEntries.length > 0 && (
             <div className="space-y-3 border-t pt-3">

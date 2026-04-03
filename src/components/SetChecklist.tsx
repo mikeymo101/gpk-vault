@@ -55,6 +55,27 @@ export function SetChecklist({
     });
   }
 
+  async function updateQuantity(entryId: string, delta: number) {
+    setLoadingKey(entryId + "qty");
+    const entry = Object.values(userCardMap)
+      .flat()
+      .find((uc) => uc.id === entryId);
+    if (!entry) return;
+
+    const newQty = entry.quantity + delta;
+    if (newQty <= 0) {
+      await supabase.from("user_cards").delete().eq("id", entryId);
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase.from("user_cards") as any)
+        .update({ quantity: newQty })
+        .eq("id", entryId);
+    }
+
+    setLoadingKey(null);
+    startTransition(() => { router.refresh(); });
+  }
+
   const [bulkLoading, setBulkLoading] = useState(false);
 
   async function bulkMarkAll(status: CardStatus) {
@@ -83,7 +104,7 @@ export function SetChecklist({
   }
 
   async function bulkClearAll() {
-    if (!confirm("Remove all status entries for this set?")) return;
+    if (!confirm("Reset this set? This will remove all Have/Want/Trade entries and quantities for every card in this set.")) return;
     setBulkLoading(true);
 
     const allEntryIds = cards.flatMap(
@@ -126,14 +147,15 @@ export function SetChecklist({
         >
           All Want
         </Button>
+        <div className="flex-1" />
         <Button
           variant="outline"
           size="sm"
-          className="h-7 text-xs text-destructive"
+          className="h-7 text-xs border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
           disabled={bulkLoading || isPending}
           onClick={bulkClearAll}
         >
-          Clear All
+          Reset Set
         </Button>
       </div>
 
@@ -217,6 +239,36 @@ export function SetChecklist({
                 </div>
 
                 <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+                  {/* Quantity controls for "have" cards */}
+                  {(() => {
+                    const haveEntry = entries.find((e) => e.status === "have");
+                    if (!haveEntry) return null;
+                    return (
+                      <div className="flex items-center gap-0.5 mr-1 sm:mr-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0 text-xs"
+                          disabled={loadingKey === haveEntry.id + "qty" || isPending}
+                          onClick={() => updateQuantity(haveEntry.id, -1)}
+                        >
+                          -
+                        </Button>
+                        <span className="text-xs font-mono w-5 text-center">
+                          {haveEntry.quantity}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0 text-xs"
+                          disabled={loadingKey === haveEntry.id + "qty" || isPending}
+                          onClick={() => updateQuantity(haveEntry.id, 1)}
+                        >
+                          +
+                        </Button>
+                      </div>
+                    );
+                  })()}
                   {statusOptions.map((opt) => {
                     const isActive = statuses.has(opt.value);
                     const btnKey = card.id + opt.value;
@@ -252,6 +304,8 @@ export function SetChecklist({
             const isHave = statuses.has("have");
             const isWant = statuses.has("want");
             const isTrade = statuses.has("for_trade");
+            const haveEntry = entries.find((e) => e.status === "have");
+            const qty = haveEntry?.quantity ?? 0;
 
             return (
               <div
@@ -293,6 +347,13 @@ export function SetChecklist({
                     {isHave && <div className="w-2 h-2 rounded-full bg-green-500" />}
                     {isWant && <div className="w-2 h-2 rounded-full bg-blue-500" />}
                     {isTrade && <div className="w-2 h-2 rounded-full bg-amber-500" />}
+                  </div>
+                )}
+
+                {/* Duplicate count badge */}
+                {qty > 1 && (
+                  <div className="absolute bottom-0 right-0 bg-green-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-tl">
+                    x{qty}
                   </div>
                 )}
 
