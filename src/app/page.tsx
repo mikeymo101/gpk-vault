@@ -1,119 +1,120 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Hero */}
-      <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-20 overflow-hidden">
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 35px,
-                currentColor 35px,
-                currentColor 36px
-              )`,
-            }}
-          />
+    <div className="min-h-screen flex items-center justify-center p-4 gpk-wallpaper">
+      {/* The Card */}
+      <div className="w-full max-w-lg rounded-2xl border-[6px] border-pink-300/80 bg-gradient-to-b from-amber-50 via-amber-50 to-amber-100 shadow-2xl overflow-hidden dark:from-amber-950/50 dark:via-amber-950/40 dark:to-amber-900/50 dark:border-pink-900/60">
+        {/* Top banner */}
+        <div className="bg-gradient-to-b from-green-700 via-green-600 to-green-700 px-6 pt-5 pb-4 text-center relative">
+          {/* Decorative corner dots */}
+          <div className="absolute top-2 left-3 w-2 h-2 rounded-full bg-yellow-400/30" />
+          <div className="absolute top-2 right-3 w-2 h-2 rounded-full bg-yellow-400/30" />
+
+          <h1 className="text-5xl sm:text-6xl font-black tracking-tighter text-white drop-shadow-lg">
+            GPK Vault
+          </h1>
+          <p className="text-[10px] sm:text-xs font-bold tracking-[0.25em] uppercase text-green-200/80 mt-1">
+            Garbage Pail Kids Collection Tracker
+          </p>
         </div>
 
-        <div className="relative text-center space-y-8 max-w-2xl">
-          {/* Logo treatment */}
-          <div className="space-y-2">
-            <h1 className="text-6xl sm:text-7xl md:text-8xl font-black tracking-tighter">
-              <span className="text-primary">GPK</span>{" "}
-              <span className="bg-gradient-to-r from-primary to-accent-foreground bg-clip-text text-transparent">
-                VAULT
-              </span>
-            </h1>
-            <div className="flex items-center justify-center gap-2 text-sm font-medium text-muted-foreground uppercase tracking-widest">
-              <span className="h-px w-8 bg-primary/40" />
-              Garbage Pail Kids Collection Tracker
-              <span className="h-px w-8 bg-primary/40" />
-            </div>
-          </div>
-
+        {/* Card body */}
+        <div className="px-5 sm:px-6 py-5 space-y-5">
           {/* Tagline */}
-          <p className="text-xl sm:text-2xl text-muted-foreground leading-relaxed max-w-lg mx-auto">
-            Track your collection. Find trades. Complete your sets. The ultimate
-            tool for GPK collectors.
-          </p>
-
-          {/* Feature highlights */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-xl mx-auto text-sm">
-            <FeatureChip label="1,240+ Cards" />
-            <FeatureChip label="15 OS Sets" />
-            <FeatureChip label="Trade Matching" />
-            <FeatureChip label="Free Forever" />
+          <div className="text-center">
+            <h2 className="text-lg font-black text-amber-950 dark:text-amber-100 tracking-tight">
+              Collector&apos;s Portal
+            </h2>
+            <p className="text-sm text-amber-800/70 dark:text-amber-200/70 mt-1 leading-relaxed">
+              Track your collection. Find trades. Complete your sets.
+              <br />
+              The ultimate tool for GPK collectors.
+            </p>
           </div>
 
-          {/* CTA */}
-          <div className="flex gap-3 justify-center pt-2">
+          {/* Feature badges */}
+          <div className="flex justify-center gap-3 sm:gap-4">
+            <FeatureBadge icon="&#9776;" label="1,240+" sublabel="Cards" />
+            <FeatureBadge icon="&#9733;" label="15" sublabel="OS Sets" />
+            <FeatureBadge icon="&#8644;" label="Trade" sublabel="Matching" />
+            <FeatureBadge icon="&#9829;" label="Free" sublabel="Forever" />
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="flex gap-3 justify-center">
             <Link href="/signup">
-              <Button size="lg" className="text-base px-8 h-12 font-bold">
+              <button className="px-6 py-2.5 rounded-lg bg-gradient-to-b from-green-500 to-green-700 text-white font-black text-sm uppercase tracking-wide shadow-md hover:from-green-400 hover:to-green-600 transition-all active:translate-y-px border-2 border-green-800/30">
                 Start Collecting
-              </Button>
+              </button>
             </Link>
             <Link href="/login">
-              <Button
-                size="lg"
-                variant="outline"
-                className="text-base px-8 h-12"
-              >
+              <button className="px-6 py-2.5 rounded-lg bg-gradient-to-b from-amber-100 to-amber-200 text-amber-900 font-bold text-sm uppercase tracking-wide shadow-md hover:from-amber-50 hover:to-amber-150 transition-all active:translate-y-px border-2 border-amber-400/50 dark:from-amber-800 dark:to-amber-900 dark:text-amber-100 dark:border-amber-700/50">
                 Sign In
-              </Button>
+              </button>
             </Link>
           </div>
-        </div>
-      </div>
 
-      {/* Feature sections */}
-      <div className="border-t bg-card">
-        <div className="container mx-auto px-4 py-16 max-w-5xl">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Divider */}
+          <div className="flex items-center gap-2">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
+            <div className="w-1.5 h-1.5 rounded-full bg-amber-400/40" />
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
+          </div>
+
+          {/* Feature cards */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
             <FeatureCard
-              title="Checklist Everything"
-              description="Browse every Original Series set with full card artwork. Mark cards as Have, Want, or For Trade. Track duplicates and condition."
-              icon={
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
-              }
+              title="Checklist"
+              description="Browse every Original Series with full card artwork."
             />
             <FeatureCard
               title="Find Trade Partners"
-              description="Our matching engine finds collectors who have what you need and need what you have. Share your want list with one click."
-              icon={
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"/><path d="m15 9 6-6"/></svg>
-              }
+              description="Our matching engine finds you trades with one click."
             />
             <FeatureCard
               title="Earn Badges"
-              description="Complete sets, hit milestones, and earn collector badges. Share your public profile and show off your collection to the community."
-              icon={
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-              }
+              description="Complete sets, hit milestones, and collect badges."
             />
           </div>
         </div>
-      </div>
 
-      {/* Footer */}
-      <footer className="border-t py-6 text-center text-sm text-muted-foreground">
-        GPK Vault is a fan project. Garbage Pail Kids is a trademark of The
-        Topps Company, Inc.
-      </footer>
+        {/* Bottom bar */}
+        <div className="bg-gradient-to-r from-green-700 via-green-600 to-green-700 px-4 py-2 text-center">
+          <p className="text-[9px] text-green-200/60">
+            GPK Vault is a fan project. Garbage Pail Kids is a trademark of The
+            Topps Company, Inc.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
 
-function FeatureChip({ label }: { label: string }) {
+function FeatureBadge({
+  icon,
+  label,
+  sublabel,
+}: {
+  icon: string;
+  label: string;
+  sublabel: string;
+}) {
   return (
-    <div className="rounded-full border bg-card px-3 py-1.5 text-center font-medium">
-      {label}
+    <div className="flex flex-col items-center gap-1">
+      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-b from-slate-400/20 to-slate-500/30 border-2 border-slate-400/30 flex items-center justify-center shadow-inner dark:from-slate-600/30 dark:to-slate-700/40 dark:border-slate-600/40">
+        <span className="text-lg sm:text-xl text-amber-800/70 dark:text-amber-200/70">
+          {icon}
+        </span>
+      </div>
+      <div className="text-center">
+        <p className="text-xs font-black text-amber-900 dark:text-amber-100 leading-none">
+          {label}
+        </p>
+        <p className="text-[9px] text-amber-700/60 dark:text-amber-300/60 leading-tight">
+          {sublabel}
+        </p>
+      </div>
     </div>
   );
 }
@@ -121,17 +122,16 @@ function FeatureChip({ label }: { label: string }) {
 function FeatureCard({
   title,
   description,
-  icon,
 }: {
   title: string;
   description: string;
-  icon: React.ReactNode;
 }) {
   return (
-    <div className="space-y-3">
-      <div className="text-primary">{icon}</div>
-      <h3 className="font-bold text-lg">{title}</h3>
-      <p className="text-muted-foreground text-sm leading-relaxed">
+    <div className="rounded-lg bg-gradient-to-b from-white/80 to-amber-50/80 border border-amber-300/30 p-3 text-center shadow-sm dark:from-amber-900/30 dark:to-amber-950/30 dark:border-amber-700/20">
+      <h3 className="font-bold text-xs text-amber-950 dark:text-amber-100 leading-tight">
+        {title}
+      </h3>
+      <p className="text-[10px] text-amber-800/60 dark:text-amber-200/60 mt-1.5 leading-snug">
         {description}
       </p>
     </div>
