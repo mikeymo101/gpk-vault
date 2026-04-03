@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { CardDetailModal } from "@/components/CardDetailModal";
 import type { Card as GPKCard, UserCard } from "@/types";
 
 type CardStatus = UserCard["status"];
@@ -28,6 +29,7 @@ export function SetChecklist({
   const [isPending, startTransition] = useTransition();
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
   const [view, setView] = useState<"list" | "grid">("list");
+  const [selectedCard, setSelectedCard] = useState<GPKCard | null>(null);
 
   async function toggleStatus(card: GPKCard, status: CardStatus) {
     const key = card.id + status;
@@ -53,12 +55,88 @@ export function SetChecklist({
     });
   }
 
+  const [bulkLoading, setBulkLoading] = useState(false);
+
+  async function bulkMarkAll(status: CardStatus) {
+    if (!confirm(`Mark all ${cards.length} cards as "${status}"?`)) return;
+    setBulkLoading(true);
+
+    // Find cards that don't already have this status
+    const toInsert = cards.filter(
+      (c) => !(userCardMap[c.id] ?? []).some((uc) => uc.status === status)
+    );
+
+    // Insert in batches of 50
+    for (let i = 0; i < toInsert.length; i += 50) {
+      const batch = toInsert.slice(i, i + 50).map((c) => ({
+        user_id: userId,
+        card_id: c.id,
+        status,
+        quantity: 1,
+      }));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase.from("user_cards") as any).insert(batch);
+    }
+
+    setBulkLoading(false);
+    startTransition(() => { router.refresh(); });
+  }
+
+  async function bulkClearAll() {
+    if (!confirm("Remove all status entries for this set?")) return;
+    setBulkLoading(true);
+
+    const allEntryIds = cards.flatMap(
+      (c) => (userCardMap[c.id] ?? []).map((uc) => uc.id)
+    );
+
+    for (let i = 0; i < allEntryIds.length; i += 50) {
+      const batch = allEntryIds.slice(i, i + 50);
+      await supabase.from("user_cards").delete().in("id", batch);
+    }
+
+    setBulkLoading(false);
+    startTransition(() => { router.refresh(); });
+  }
+
   const haveCount = cards.filter((c) =>
     userCardMap[c.id]?.some((uc) => uc.status === "have")
   ).length;
 
   return (
     <div className="space-y-4">
+      {/* Bulk actions */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-sm text-muted-foreground mr-1">Bulk:</span>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-7 text-xs"
+          disabled={bulkLoading || isPending}
+          onClick={() => bulkMarkAll("have")}
+        >
+          All Have
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-7 text-xs"
+          disabled={bulkLoading || isPending}
+          onClick={() => bulkMarkAll("want")}
+        >
+          All Want
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-7 text-xs text-destructive"
+          disabled={bulkLoading || isPending}
+          onClick={bulkClearAll}
+        >
+          Clear All
+        </Button>
+      </div>
+
       {/* Progress bar + view toggle */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-4 text-sm text-muted-foreground flex-1">
@@ -111,6 +189,10 @@ export function SetChecklist({
                 className="flex items-center justify-between px-3 py-2 sm:px-4 sm:py-3 hover:bg-accent/30 transition-colors"
               >
                 <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                  <button
+                  className="flex items-center gap-2 sm:gap-3 min-w-0 cursor-pointer"
+                  onClick={() => setSelectedCard(card)}
+                >
                   {card.image_url_a ? (
                     <img
                       src={card.image_url_a}
@@ -123,7 +205,7 @@ export function SetChecklist({
                       ?
                     </div>
                   )}
-                  <div className="min-w-0">
+                  <div className="min-w-0 text-left">
                     <span className="text-xs font-mono text-muted-foreground">
                       {card.number}
                     </span>
@@ -131,6 +213,7 @@ export function SetChecklist({
                       {card.name_a}
                     </p>
                   </div>
+                </button>
                 </div>
 
                 <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
@@ -183,6 +266,7 @@ export function SetChecklist({
                         : "border-transparent opacity-60"
                 }`}
               >
+                <div onClick={() => setSelectedCard(card)}>
                 {card.image_url_a ? (
                   <img
                     src={card.image_url_a}
@@ -212,6 +296,7 @@ export function SetChecklist({
                   </div>
                 )}
 
+                </div>
                 {/* Hover overlay with buttons */}
                 <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 p-1">
                   <p className="text-white text-[10px] text-center font-medium leading-tight mb-1 line-clamp-2">
@@ -228,7 +313,10 @@ export function SetChecklist({
                         size="sm"
                         className="h-6 px-2 text-[10px] w-full"
                         disabled={loadingKey === btnKey || isPending}
-                        onClick={() => toggleStatus(card, opt.value)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleStatus(card, opt.value);
+                        }}
                       >
                         {isActive && "✓ "}
                         {opt.label}
@@ -240,6 +328,17 @@ export function SetChecklist({
             );
           })}
         </div>
+      )}
+
+      {/* Card detail modal */}
+      {selectedCard && (
+        <CardDetailModal
+          card={selectedCard}
+          userEntries={userCardMap[selectedCard.id] ?? []}
+          userId={userId}
+          open={!!selectedCard}
+          onClose={() => setSelectedCard(null)}
+        />
       )}
     </div>
   );

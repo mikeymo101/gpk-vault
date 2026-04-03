@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { CollectionView } from "@/components/CollectionView";
+import { ExportButton } from "@/components/ExportButton";
 import type { UserCardWithDetails } from "@/types";
 
 export default async function CollectionPage() {
@@ -30,11 +31,14 @@ export default async function CollectionPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">My Collection</h1>
-        <p className="text-muted-foreground">
-          Manage your Garbage Pail Kids cards
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">My Collection</h1>
+          <p className="text-muted-foreground">
+            Manage your Garbage Pail Kids cards
+          </p>
+        </div>
+        <ExportButton userCards={userCards} />
       </div>
 
       <div className="grid grid-cols-3 gap-4">

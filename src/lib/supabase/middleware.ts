@@ -34,7 +34,7 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Redirect unauthenticated users to login (except public pages)
-  const publicPaths = ["/login", "/signup", "/auth/callback"];
+  const publicPaths = ["/login", "/signup", "/auth/callback", "/u/"];
   const isPublicPath = publicPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );
@@ -45,8 +45,11 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users away from auth pages
-  if (user && isPublicPath) {
+  // Redirect authenticated users away from auth pages (but not public profile pages)
+  const isAuthPath = ["/login", "/signup", "/auth/callback"].some((path) =>
+    request.nextUrl.pathname.startsWith(path)
+  );
+  if (user && isAuthPath) {
     const url = request.nextUrl.clone();
     url.pathname = "/collection";
     return NextResponse.redirect(url);
