@@ -45,6 +45,7 @@ export type Database = {
           image_url_b: string | null;
           is_parallel: boolean;
           parallel_type: string | null;
+          estimated_value_cents: number | null;
           created_at: string;
         };
         Insert: {
@@ -235,6 +236,17 @@ export type Database = {
       listing_status: "active" | "sold" | "cancelled";
     };
   };
+};
+
+// Badge type (not in generated schema yet)
+export type Badge = {
+  id: string;
+  user_id: string;
+  badge_type: string;
+  badge_name: string;
+  badge_description: string | null;
+  earned_at: string;
+  metadata: Record<string, unknown> | null;
 };
 
 // Convenience types

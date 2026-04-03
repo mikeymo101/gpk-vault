@@ -18,6 +18,8 @@ import type { Profile } from "@/types";
 const navLinks = [
   { href: "/collection", label: "Collection" },
   { href: "/sets", label: "Sets" },
+  { href: "/needs", label: "Need" },
+  { href: "/trades", label: "Trades" },
   { href: "/search", label: "Search" },
 ];
 
