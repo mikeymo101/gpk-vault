@@ -30,12 +30,8 @@ export default async function CollectionPage() {
   const haveCount = haveCards.length;
   const wantCount = userCards.filter((uc) => uc.status === "want").length;
   const tradeCount = userCards.filter((uc) => uc.status === "for_trade").length;
+  const saleCount = userCards.filter((uc) => uc.status === "for_sale").length;
   const dupeCount = haveCards.reduce((sum, uc) => sum + Math.max(0, uc.quantity - 1), 0);
-
-  const totalValueCents = haveCards.reduce(
-    (sum, uc) => sum + (uc.cards.estimated_value_cents ?? 0) * uc.quantity,
-    0
-  );
 
   const setIds = new Set(haveCards.map((uc) => uc.cards.sets.id));
   const { data: allSets } = await supabase.from("sets").select("*");
@@ -71,18 +67,6 @@ export default async function CollectionPage() {
         <ExportButton userCards={userCards} />
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-        <div className="gpk-stat"><div className="value">{haveCount}</div><div className="label">Have</div></div>
-        <div className="gpk-stat"><div className="value">{wantCount}</div><div className="label">Want</div></div>
-        <div className="gpk-stat"><div className="value">{tradeCount}</div><div className="label">For Trade</div></div>
-        <div className="gpk-stat"><div className="value">{dupeCount}</div><div className="label">Dupes</div></div>
-        <div className="gpk-stat">
-          <div className="value">{totalValueCents > 0 ? `$${Math.round(totalValueCents / 100)}` : "—"}</div>
-          <div className="label">Est. Value</div>
-        </div>
-      </div>
-
       {completedSets.length > 0 && (
         <div className="gpk-panel !bg-green-50/50 !border-green-300/40">
           <p className="text-sm font-medium text-green-800">
@@ -97,7 +81,16 @@ export default async function CollectionPage() {
         <ShareWantList username={username} wantCount={wantCount} />
       )}
 
-      <CollectionView userCards={userCards} />
+      <CollectionView
+        userCards={userCards}
+        stats={{
+          have: haveCount,
+          want: wantCount,
+          forTrade: tradeCount,
+          forSale: saleCount,
+          dupes: dupeCount,
+        }}
+      />
     </div>
   );
 }
