@@ -4,8 +4,9 @@
 import sharp from "sharp";
 import path from "path";
 
-const TILE_SIZE = 800;
-const ICON_SIZE = 90;
+const TILE_SIZE = 900;
+const ICON_SIZE = 80;
+const OPACITY = 0.08; // 8% opacity — very subtle
 const ICONS_DIR = path.resolve(__dirname, "../../icons");
 const OUT = path.resolve(__dirname, "../public/gpk-pattern-tile.png");
 
@@ -17,69 +18,45 @@ const stickers = [
   "sticker_tentacles.png",
 ];
 
-// Placement grid — [x, y, stickerIndex, sizeMult]
-// Spread evenly with slight offsets for organic feel
-const placements: [number, number, number, number][] = [
-  // Row 1
-  [70, 60, 0, 0.9],
-  [230, 40, 3, 0.8],
-  [400, 70, 1, 0.85],
-  [560, 45, 4, 0.9],
-  [720, 65, 2, 0.8],
+// Even grid with slight offsets for organic feel
+// 6 columns x 6 rows, staggered every other row
+function generatePlacements(): [number, number, number][] {
+  const cols = 6;
+  const rows = 6;
+  const spacingX = TILE_SIZE / cols;
+  const spacingY = TILE_SIZE / rows;
+  const placements: [number, number, number][] = []; // x, y, stickerIdx
 
-  // Row 2
-  [140, 200, 2, 0.85],
-  [330, 190, 0, 0.8],
-  [500, 210, 3, 0.9],
-  [680, 185, 1, 0.85],
+  let stickerIdx = 0;
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      // Center of cell
+      let x = Math.round(col * spacingX + spacingX / 2);
+      let y = Math.round(row * spacingY + spacingY / 2);
 
-  // Row 3
-  [60, 340, 4, 0.8],
-  [240, 360, 1, 0.9],
-  [420, 330, 2, 0.85],
-  [590, 355, 0, 0.8],
-  [750, 340, 3, 0.9],
+      // Stagger odd rows by half a cell
+      if (row % 2 === 1) {
+        x += Math.round(spacingX / 2);
+        if (x >= TILE_SIZE) x -= TILE_SIZE;
+      }
 
-  // Row 4
-  [150, 490, 3, 0.85],
-  [340, 510, 4, 0.8],
-  [510, 480, 1, 0.9],
-  [690, 500, 2, 0.85],
+      // Small random-ish offset for organic feel (deterministic based on position)
+      const seed = (row * 7 + col * 13) % 20;
+      x += (seed - 10) * 1.5;
+      y += ((seed * 3) % 20 - 10) * 1.2;
 
-  // Row 5
-  [70, 640, 1, 0.8],
-  [250, 660, 2, 0.85],
-  [430, 635, 4, 0.9],
-  [600, 655, 3, 0.8],
-  [760, 640, 0, 0.85],
+      placements.push([x, y, stickerIdx % stickers.length]);
+      stickerIdx++;
+    }
+  }
 
-  // Edge wrapping: icons near edges duplicated on opposite side
-  // Top edge icons also at bottom
-  [70, 60 + TILE_SIZE, 0, 0.9],
-  [230, 40 + TILE_SIZE, 3, 0.8],
-  [400, 70 + TILE_SIZE, 1, 0.85],
-  [560, 45 + TILE_SIZE, 4, 0.9],
-  [720, 65 + TILE_SIZE, 2, 0.8],
-  // Bottom edge icons also at top
-  [70, 640 - TILE_SIZE, 1, 0.8],
-  [250, 660 - TILE_SIZE, 2, 0.85],
-  [430, 635 - TILE_SIZE, 4, 0.9],
-  [600, 655 - TILE_SIZE, 3, 0.8],
-  [760, 640 - TILE_SIZE, 0, 0.85],
-  // Left edge icons also at right
-  [60 + TILE_SIZE, 340, 4, 0.8],
-  [70 + TILE_SIZE, 640, 1, 0.8],
-  [70 + TILE_SIZE, 60, 0, 0.9],
-  // Right edge icons also at left
-  [750 - TILE_SIZE, 340, 3, 0.9],
-  [760 - TILE_SIZE, 640, 0, 0.85],
-  [720 - TILE_SIZE, 65, 2, 0.8],
-];
+  return placements;
+}
 
 async function generate() {
   console.log("Generating seamless pattern tile...");
 
-  // Pre-load and resize stickers
+  // Pre-load stickers
   const stickerBuffers: Buffer[] = [];
   for (const name of stickers) {
     const buf = await sharp(path.join(ICONS_DIR, name))
@@ -90,17 +67,29 @@ async function generate() {
     stickerBuffers.push(buf);
   }
 
-  // Build composite list
+  const placements = generatePlacements();
   const composites: sharp.OverlayOptions[] = [];
 
-  for (const [x, y, stickerIdx, sizeMult] of placements) {
-    const size = Math.round(ICON_SIZE * sizeMult);
+  // For seamless tiling, also render wrapped versions of edge icons
+  const allPlacements: [number, number, number][] = [];
+  for (const [x, y, idx] of placements) {
+    allPlacements.push([x, y, idx]);
+    // Wrap edges
+    if (x < ICON_SIZE) allPlacements.push([x + TILE_SIZE, y, idx]);
+    if (x > TILE_SIZE - ICON_SIZE) allPlacements.push([x - TILE_SIZE, y, idx]);
+    if (y < ICON_SIZE) allPlacements.push([x, y + TILE_SIZE, idx]);
+    if (y > TILE_SIZE - ICON_SIZE) allPlacements.push([x, y - TILE_SIZE, idx]);
+  }
 
-    // Resize to target size and reduce saturation for watermark look
+  for (const [x, y, stickerIdx] of allPlacements) {
+    // Vary size slightly per icon
+    const sizeSeed = (Math.round(x) * 3 + Math.round(y) * 7) % 10;
+    const size = Math.round(ICON_SIZE * (0.85 + sizeSeed * 0.03));
+
     const resized = await sharp(stickerBuffers[stickerIdx])
       .resize(size, size, { fit: "inside" })
-      .modulate({ saturation: 0.35, brightness: 1.1 })
-      .ensureAlpha(0.15)  // 15% opacity
+      .modulate({ saturation: 0.25, brightness: 1.15 })
+      .ensureAlpha(OPACITY)
       .png()
       .toBuffer();
 
@@ -108,42 +97,31 @@ async function generate() {
     const w = meta.width ?? size;
     const h = meta.height ?? size;
 
-    // Center the icon on the placement point, clip to tile bounds
     let left = Math.round(x - w / 2);
     let top = Math.round(y - h / 2);
 
-    // Skip if entirely outside tile
+    // Skip if entirely outside
     if (left + w < 0 || left >= TILE_SIZE || top + h < 0 || top >= TILE_SIZE) continue;
 
-    // Clip to tile bounds
+    // Clip to bounds
     if (left < 0 || top < 0 || left + w > TILE_SIZE || top + h > TILE_SIZE) {
-      const extractLeft = Math.max(0, -left);
-      const extractTop = Math.max(0, -top);
-      const extractWidth = Math.min(w - extractLeft, TILE_SIZE - Math.max(0, left));
-      const extractHeight = Math.min(h - extractTop, TILE_SIZE - Math.max(0, top));
-
-      if (extractWidth <= 0 || extractHeight <= 0) continue;
+      const eL = Math.max(0, -left);
+      const eT = Math.max(0, -top);
+      const eW = Math.min(w - eL, TILE_SIZE - Math.max(0, left));
+      const eH = Math.min(h - eT, TILE_SIZE - Math.max(0, top));
+      if (eW <= 0 || eH <= 0) continue;
 
       const cropped = await sharp(resized)
-        .extract({ left: extractLeft, top: extractTop, width: extractWidth, height: extractHeight })
+        .extract({ left: eL, top: eT, width: eW, height: eH })
         .png()
         .toBuffer();
 
-      composites.push({
-        input: cropped,
-        left: Math.max(0, left),
-        top: Math.max(0, top),
-      });
+      composites.push({ input: cropped, left: Math.max(0, left), top: Math.max(0, top) });
     } else {
-      composites.push({
-        input: resized,
-        left,
-        top,
-      });
+      composites.push({ input: resized, left, top });
     }
   }
 
-  // Create transparent canvas and composite everything
   await sharp({
     create: {
       width: TILE_SIZE,
@@ -156,7 +134,7 @@ async function generate() {
     .png()
     .toFile(OUT);
 
-  console.log(`✓ Saved ${OUT} (${TILE_SIZE}x${TILE_SIZE}, ${composites.length} icons placed)`);
+  console.log(`✓ Saved ${OUT} (${TILE_SIZE}x${TILE_SIZE}, ${composites.length} icons)`);
 }
 
 generate().catch(console.error);
