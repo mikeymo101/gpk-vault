@@ -31,37 +31,62 @@ function seededRandom(seed: number): () => number {
   };
 }
 
-// Generate evenly-distributed but random-looking placements using Poisson disk-like approach
+// Generate evenly-distributed random placements where same icons are never near each other
 function generatePlacements(): [number, number, number][] {
-  const rng = seededRandom(42);
-  const minDist = 140; // minimum distance between icons
+  const rng = seededRandom(77);
+  const minDist = 150; // minimum distance between ANY icons
+  const minSameIconDist = 350; // minimum distance between SAME icon type
   const placements: [number, number, number][] = [];
-  const maxAttempts = 2000;
-  const targetCount = 40;
+  const maxAttempts = 5000;
+  const targetCount = 36;
+
+  // Toroidal distance (wraps around edges)
+  function toroidalDist(x1: number, y1: number, x2: number, y2: number): number {
+    let dx = Math.abs(x1 - x2);
+    let dy = Math.abs(y1 - y2);
+    if (dx > TILE_SIZE / 2) dx = TILE_SIZE - dx;
+    if (dy > TILE_SIZE / 2) dy = TILE_SIZE - dy;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
 
   for (let i = 0; i < maxAttempts && placements.length < targetCount; i++) {
     const x = rng() * TILE_SIZE;
     const y = rng() * TILE_SIZE;
 
-    // Check distance to all existing placements (including wrapped versions)
+    // Check minimum distance to all existing icons
     let tooClose = false;
     for (const [px, py] of placements) {
-      // Check with wrapping (toroidal distance)
-      let dx = Math.abs(x - px);
-      let dy = Math.abs(y - py);
-      if (dx > TILE_SIZE / 2) dx = TILE_SIZE - dx;
-      if (dy > TILE_SIZE / 2) dy = TILE_SIZE - dy;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < minDist) {
+      if (toroidalDist(x, y, px, py) < minDist) {
         tooClose = true;
         break;
       }
     }
+    if (tooClose) continue;
 
-    if (!tooClose) {
-      const stickerIdx = Math.floor(rng() * stickers.length);
-      placements.push([Math.round(x), Math.round(y), stickerIdx]);
+    // Pick a sticker that isn't too close to another of the same type
+    // Shuffle sticker indices and pick the first valid one
+    const indices = Array.from({ length: stickers.length }, (_, i) => i);
+    // Fisher-Yates shuffle
+    for (let j = indices.length - 1; j > 0; j--) {
+      const k = Math.floor(rng() * (j + 1));
+      [indices[j], indices[k]] = [indices[k], indices[j]];
     }
+
+    let chosenIdx = -1;
+    for (const idx of indices) {
+      const sameIconTooClose = placements.some(
+        ([px, py, pidx]) => pidx === idx && toroidalDist(x, y, px, py) < minSameIconDist
+      );
+      if (!sameIconTooClose) {
+        chosenIdx = idx;
+        break;
+      }
+    }
+
+    // If no icon works (unlikely), skip this position
+    if (chosenIdx === -1) continue;
+
+    placements.push([Math.round(x), Math.round(y), chosenIdx]);
   }
 
   return placements;
