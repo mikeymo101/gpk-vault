@@ -37,6 +37,10 @@ const conditionOptions = [
   "Good",
   "Fair",
   "Poor",
+  "PSA Graded",
+  "BGS Graded",
+  "CGC Graded",
+  "SGC Graded",
 ];
 
 export function CardDetailModal({
