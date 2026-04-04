@@ -317,9 +317,9 @@ export function SetChecklist({
                           size="sm"
                           className="h-6 w-6 p-0 text-xs"
                           disabled={loadingKey === haveEntry.id + "qty" || isPending}
-                          onClick={() => updateQuantity(haveEntry.id, -1)}
+                          onClick={() => updateQuantity(haveEntry.id, 1)}
                         >
-                          -
+                          +
                         </Button>
                         <span className="text-xs font-mono w-5 text-center">
                           {haveEntry.quantity}
@@ -329,9 +329,9 @@ export function SetChecklist({
                           size="sm"
                           className="h-6 w-6 p-0 text-xs"
                           disabled={loadingKey === haveEntry.id + "qty" || isPending}
-                          onClick={() => updateQuantity(haveEntry.id, 1)}
+                          onClick={() => updateQuantity(haveEntry.id, -1)}
                         >
-                          +
+                          -
                         </Button>
                       </div>
                     )}

@@ -171,6 +171,24 @@ export function CardDetailModal({
                     className="h-8 w-8 p-0"
                     disabled={isPending}
                     onClick={async () => {
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      await (supabase.from("user_cards") as any)
+                        .update({ quantity: haveEntry.quantity + 1 })
+                        .eq("id", haveEntry.id);
+                      startTransition(() => { router.refresh(); });
+                    }}
+                  >
+                    +
+                  </Button>
+                  <span className="text-lg font-bold w-8 text-center">
+                    {haveEntry.quantity}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    disabled={isPending}
+                    onClick={async () => {
                       const newQty = haveEntry.quantity - 1;
                       if (newQty <= 0) {
                         await supabase.from("user_cards").delete().eq("id", haveEntry.id);
@@ -184,24 +202,6 @@ export function CardDetailModal({
                     }}
                   >
                     -
-                  </Button>
-                  <span className="text-lg font-bold w-8 text-center">
-                    {haveEntry.quantity}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 w-8 p-0"
-                    disabled={isPending}
-                    onClick={async () => {
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      await (supabase.from("user_cards") as any)
-                        .update({ quantity: haveEntry.quantity + 1 })
-                        .eq("id", haveEntry.id);
-                      startTransition(() => { router.refresh(); });
-                    }}
-                  >
-                    +
                   </Button>
                 </div>
                 {haveEntry.quantity > 1 && (
