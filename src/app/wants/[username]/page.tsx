@@ -49,8 +49,9 @@ export default async function PublicWantListPage({
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-4xl space-y-6">
+    <div className="min-h-screen gpk-wallpaper">
+      <div className="container mx-auto px-3 sm:px-4 py-6 max-w-4xl">
+        <div className="rounded-2xl border-4 border-[#d4a0b0]/60 bg-[#e8dcc8]/95 shadow-xl p-4 sm:p-6 space-y-6 backdrop-blur-sm">
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">
             {profile.display_name || profile.username}&apos;s Want List
@@ -124,9 +125,10 @@ export default async function PublicWantListPage({
         )}
 
         <div className="text-center pt-4">
-          <Link href="/" className="text-sm text-muted-foreground hover:underline">
+          <Link href="/" className="text-sm gpk-muted hover:underline">
             GPK Vault — Track your Garbage Pail Kids collection
           </Link>
+        </div>
         </div>
       </div>
     </div>

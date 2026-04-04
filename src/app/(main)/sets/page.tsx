@@ -68,12 +68,10 @@ export default async function SetsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Browse Sets</h1>
-        <p className="text-muted-foreground">
-          Select a set to view its checklist
-        </p>
+        <h1 className="gpk-heading text-2xl">Browse Sets</h1>
+        <p className="gpk-muted text-sm">Select a set to view its checklist</p>
       </div>
 
       {sets.length === 0 ? (
@@ -97,7 +95,7 @@ export default async function SetsPage() {
 
             return (
               <Link key={set.id} href={`/sets/${set.id}`}>
-                <Card className="hover:border-primary/50 transition-all cursor-pointer h-full overflow-hidden group">
+                <Card className="hover:border-[#c4a090] transition-all cursor-pointer h-full overflow-hidden group bg-gradient-to-b from-[#f4ece0] to-[#e8dcc8] border-[#d4c0a8]">
                   <div className="flex">
                     {/* Cover card image */}
                     <div className="w-24 sm:w-28 shrink-0 bg-muted relative overflow-hidden">

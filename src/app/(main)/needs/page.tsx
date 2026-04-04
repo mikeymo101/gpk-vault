@@ -25,7 +25,7 @@ export default async function NeedsPage() {
 
   if (activeSets.size === 0) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-5">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">What Do I Need?</h1>
           <p className="text-muted-foreground">
@@ -84,10 +84,10 @@ export default async function NeedsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">What Do I Need?</h1>
-        <p className="text-muted-foreground">
+        <h1 className="gpk-heading text-2xl">What Do I Need?</h1>
+        <p className="gpk-muted text-sm">
           {missingCards.length} cards missing from {activeSets.size} set{activeSets.size !== 1 ? "s" : ""} you&apos;re collecting
         </p>
       </div>

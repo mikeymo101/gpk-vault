@@ -37,23 +37,23 @@ export default async function TradesPage() {
   const tradeMatches = (matches ?? []) as unknown as TradeMatch[];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Trade Matches</h1>
-        <p className="text-muted-foreground">
+        <h1 className="gpk-heading text-2xl">Trade Matches</h1>
+        <p className="gpk-muted text-sm">
           Collectors who have what you need — and need what you have
         </p>
       </div>
 
       {/* User context */}
-      <div className="flex gap-4 text-sm">
-        <div className="rounded-lg border bg-card px-4 py-2">
-          <span className="text-muted-foreground">Your wants: </span>
-          <span className="font-bold">{wantCount}</span>
+      <div className="flex gap-3 text-sm">
+        <div className="gpk-stat !py-2 !px-4 flex-row !text-left">
+          <span className="gpk-muted text-xs">Your wants: </span>
+          <span className="font-bold text-[#3a3025]">{wantCount}</span>
         </div>
-        <div className="rounded-lg border bg-card px-4 py-2">
-          <span className="text-muted-foreground">Your tradeable: </span>
-          <span className="font-bold">{haveCount}</span>
+        <div className="gpk-stat !py-2 !px-4 flex-row !text-left">
+          <span className="gpk-muted text-xs">Your tradeable: </span>
+          <span className="font-bold text-[#3a3025]">{haveCount}</span>
         </div>
       </div>
 

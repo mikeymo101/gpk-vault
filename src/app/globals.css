@@ -164,6 +164,48 @@
   z-index: 0;
 }
 
+/* GPK page heading */
+.gpk-heading {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #3a3025;
+  font-weight: 800;
+}
+
+/* GPK subtext */
+.gpk-muted {
+  color: #6b5d4d;
+}
+
+/* GPK panel — inner card sections */
+.gpk-panel {
+  background: linear-gradient(to bottom, #f0e4d4, #e8dcc8);
+  border: 1px solid #d4c0a8;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+/* GPK stat card */
+.gpk-stat {
+  background: linear-gradient(to bottom, #f4ece0, #e8dcc8);
+  border: 1px solid #d4c0a8;
+  border-radius: 10px;
+  text-align: center;
+  padding: 12px 8px;
+}
+
+.gpk-stat .value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #3a3025;
+}
+
+.gpk-stat .label {
+  font-size: 0.65rem;
+  color: #8a7a6a;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 /* GPK Card Back styling */
 .gpk-card-back {
   background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d4a574' fill-opacity='0.05'%3E%3Cpath d='M5 0h1L0 5V4zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");

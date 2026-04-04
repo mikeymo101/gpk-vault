@@ -39,10 +39,10 @@ export default async function SearchPage({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Search Cards</h1>
-        <p className="text-muted-foreground">
+        <h1 className="gpk-heading text-2xl">Search Cards</h1>
+        <p className="gpk-muted text-sm">
           Search across all sets by card name or number
         </p>
       </div>
