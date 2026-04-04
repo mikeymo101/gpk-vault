@@ -21,6 +21,13 @@ export function NeedsCardGrid({
   async function markAsHave(card: GPKCard) {
     setAddingId(card.id);
 
+    // Remove any "want" entry for this card since we now have it
+    await supabase.from("user_cards")
+      .delete()
+      .eq("user_id", userId)
+      .eq("card_id", card.id)
+      .eq("status", "want");
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase.from("user_cards") as any).insert({
       user_id: userId,

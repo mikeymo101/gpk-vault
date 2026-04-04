@@ -42,6 +42,14 @@ export function SetChecklist({
     if (existing) {
       await supabase.from("user_cards").delete().eq("id", existing.id);
     } else {
+      // When marking as "have", auto-remove "want" since you got it
+      if (status === "have") {
+        const wantEntry = userCardMap[card.id]?.find((uc) => uc.status === "want");
+        if (wantEntry) {
+          await supabase.from("user_cards").delete().eq("id", wantEntry.id);
+        }
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabase.from("user_cards") as any).insert({
         user_id: userId,
