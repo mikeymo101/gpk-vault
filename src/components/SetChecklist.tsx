@@ -28,24 +28,50 @@ export function SetChecklist({
   const supabase = createClient();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [loadingKey, setLoadingKey] = useState<string | null>(null);
   const [view, setView] = useState<"list" | "grid">("list");
   const [selectedCard, setSelectedCard] = useState<GPKCard | null>(null);
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
 
-  async function toggleStatus(card: GPKCard, status: CardStatus) {
-    const key = card.id + status;
-    setLoadingKey(key);
+  // Optimistic state: track pending changes before server confirms
+  const [optimisticAdds, setOptimisticAdds] = useState<Set<string>>(new Set());
+  const [optimisticRemoves, setOptimisticRemoves] = useState<Set<string>>(new Set());
+  const [loadingKey, setLoadingKey] = useState<string | null>(null);
 
-    const existing = userCardMap[card.id]?.find((uc) => uc.status === status);
+  // Merge optimistic state with server state
+  function getEntries(cardId: string): UserCard[] {
+    let entries = userCardMap[cardId] ?? [];
+    // Remove optimistically deleted entries
+    entries = entries.filter((e) => !optimisticRemoves.has(e.id));
+    return entries;
+  }
+
+  function getStatuses(cardId: string): Set<string> {
+    const entries = getEntries(cardId);
+    const s: Set<string> = new Set(entries.map((e) => e.status as string));
+    for (const key of optimisticAdds) {
+      const [cid, status] = key.split("::");
+      if (cid === cardId) s.add(status);
+    }
+    return s;
+  }
+
+  async function toggleStatus(card: GPKCard, status: CardStatus) {
+    const entries = getEntries(card.id);
+    const existing = entries.find((uc) => uc.status === (status as string));
 
     if (existing) {
+      // Optimistic remove
+      setOptimisticRemoves((prev) => new Set(prev).add(existing.id));
       await supabase.from("user_cards").delete().eq("id", existing.id);
     } else {
-      // When marking as "have", auto-remove "want" since you got it
+      // Optimistic add
+      setOptimisticAdds((prev) => new Set(prev).add(`${card.id}::${status}`));
+
+      // When marking as "have", auto-remove "want"
       if (status === "have") {
-        const wantEntry = userCardMap[card.id]?.find((uc) => uc.status === "want");
+        const wantEntry = entries.find((uc) => uc.status === "want");
         if (wantEntry) {
+          setOptimisticRemoves((prev) => new Set(prev).add(wantEntry.id));
           await supabase.from("user_cards").delete().eq("id", wantEntry.id);
         }
       }
@@ -59,7 +85,9 @@ export function SetChecklist({
       });
     }
 
-    setLoadingKey(null);
+    // Clear optimistic state and sync with server
+    setOptimisticAdds(new Set());
+    setOptimisticRemoves(new Set());
     startTransition(() => {
       router.refresh();
     });
@@ -131,7 +159,7 @@ export function SetChecklist({
   }
 
   const haveCount = cards.filter((c) =>
-    userCardMap[c.id]?.some((uc) => uc.status === "have")
+    getStatuses(c.id).has("have")
   ).length;
 
   return (
@@ -212,8 +240,8 @@ export function SetChecklist({
       {view === "list" && (
         <div className="rounded-lg overflow-hidden">
           {cards.map((card) => {
-            const entries = userCardMap[card.id] ?? [];
-            const statuses = new Set(entries.map((e) => e.status));
+            const entries = getEntries(card.id);
+            const statuses = getStatuses(card.id);
             const isOwned = statuses.has("have");
 
             const haveEntry = entries.find((e) => e.status === "have");
@@ -350,8 +378,8 @@ export function SetChecklist({
       {view === "grid" && (
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2">
           {cards.map((card) => {
-            const entries = userCardMap[card.id] ?? [];
-            const statuses = new Set(entries.map((e) => e.status));
+            const entries = getEntries(card.id);
+            const statuses = getStatuses(card.id);
             const isHave = statuses.has("have");
             const isWant = statuses.has("want");
             const isTrade = statuses.has("for_trade");
