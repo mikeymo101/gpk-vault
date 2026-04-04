@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,30 +44,26 @@ export function NavBar({
   }
 
   return (
-    <header className="bg-gradient-to-r from-green-800 via-green-700 to-green-800 sticky top-0 z-50 shadow-lg border-b-2 border-green-900/30">
-      <div className="container mx-auto px-4 max-w-7xl flex h-12 items-center justify-between">
+    <header className="bg-[#111] sticky top-0 z-50 border-b-4 border-[#7ED957]">
+      <div className="container mx-auto px-4 max-w-7xl flex h-14 items-center justify-between">
         <div className="flex items-center gap-4 sm:gap-6">
           <Link href="/collection">
-            <img
-              src="/logo.png"
-              alt="GPK Vault"
-              className="h-9 drop-shadow"
-            />
+            <img src="/logo.png" alt="GPK Vault" className="h-9 drop-shadow" />
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden sm:flex items-center gap-0.5">
+          <nav className="hidden sm:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href}>
-                <button
-                  className={`px-3 py-1 rounded text-xs font-bold uppercase tracking-wide transition-colors ${
+                <span
+                  className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wide transition-all border-2 inline-block ${
                     pathname.startsWith(link.href)
-                      ? "bg-green-900/60 text-yellow-300"
-                      : "text-green-100/80 hover:bg-green-600/40 hover:text-white"
+                      ? "bg-[#7ED957] text-[#111] border-[#7ED957] shadow-[2px_2px_0_#000]"
+                      : "text-[#999] border-transparent hover:text-[#7ED957] hover:border-[#333]"
                   }`}
                 >
                   {link.label}
-                </button>
+                </span>
               </Link>
             ))}
           </nav>
@@ -77,17 +72,17 @@ export function NavBar({
         <div className="flex items-center gap-2">
           {/* Mobile hamburger */}
           <button
-            className="sm:hidden h-8 w-8 p-0 inline-flex items-center justify-center text-green-100/80 hover:text-white"
+            className="sm:hidden h-8 w-8 p-0 inline-flex items-center justify-center text-[#999] hover:text-[#7ED957]"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
             >
@@ -106,9 +101,11 @@ export function NavBar({
           </button>
 
           <DropdownMenu>
-            <DropdownMenuTrigger className="relative h-8 w-8 rounded-full inline-flex items-center justify-center hover:bg-green-600/40">
+            <DropdownMenuTrigger className="relative h-9 w-9 rounded-full inline-flex items-center justify-center border-2 border-[#333] hover:border-[#7ED957] transition-colors">
               <Avatar className="h-8 w-8">
-                <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+                <AvatarFallback className="text-xs bg-[#222] text-[#7ED957] font-bold">
+                  {initials}
+                </AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -123,24 +120,24 @@ export function NavBar({
         </div>
       </div>
 
-      {/* Mobile nav dropdown */}
+      {/* Mobile nav */}
       {mobileOpen && (
-        <div className="sm:hidden bg-green-800/90 border-t border-green-600/30 px-4 py-2 space-y-0.5">
+        <div className="sm:hidden bg-[#111] border-t border-[#222] px-4 py-2 space-y-1">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setMobileOpen(false)}
             >
-              <button
-                className={`w-full text-left px-3 py-2 rounded text-sm font-bold uppercase tracking-wide transition-colors ${
+              <span
+                className={`block w-full text-left px-3 py-2 rounded-lg text-sm font-bold uppercase tracking-wide transition-colors ${
                   pathname.startsWith(link.href)
-                    ? "bg-green-900/60 text-yellow-300"
-                    : "text-green-100/80 hover:bg-green-600/40 hover:text-white"
+                    ? "bg-[#7ED957] text-[#111]"
+                    : "text-[#999] hover:text-[#7ED957]"
                 }`}
               >
                 {link.label}
-              </button>
+              </span>
             </Link>
           ))}
         </div>

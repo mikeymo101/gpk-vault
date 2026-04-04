@@ -23,15 +23,18 @@ export default async function MainLayout({
     .single();
 
   return (
-    <div className="min-h-screen gpk-wallpaper">
-      <NavBar user={user} profile={profile} />
-      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-5xl">
-        <div className="rounded-2xl border-4 border-[#d4a0b0]/60 bg-[#e8dcc8]/95 shadow-xl overflow-hidden backdrop-blur-sm">
-          <div className="p-4 sm:p-6">
+    <div className="min-h-screen bg-[#F2E8D5] relative">
+      {/* Subtle GPK pattern */}
+      <div className="gpk-wallpaper-subtle" />
+
+      <div className="relative z-10">
+        <NavBar user={user} profile={profile} />
+        <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-6xl">
+          <div className="gpk-panel p-4 sm:p-6">
             {children}
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

@@ -37,17 +37,13 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 gpk-wallpaper">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-2">
-            <img src="/logo.png" alt="GPK Vault" className="h-16 drop-shadow" />
-          </div>
-          <CardTitle className="sr-only">Sign In</CardTitle>
-          <p className="text-muted-foreground mt-1">
+      <div className="w-full max-w-md gpk-panel p-6">
+        <div className="text-center mb-6">
+          <img src="/logo.png" alt="GPK Vault" className="h-16 mx-auto drop-shadow-[3px_3px_0_rgba(0,0,0,0.2)] mb-3" />
+          <p className="text-sm text-[#555]">
             Sign in to manage your collection
           </p>
-        </CardHeader>
-        <CardContent>
+        </div>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <Input
@@ -70,18 +66,17 @@ export default function LoginPage() {
             {error && (
               <p className="text-sm text-destructive">{error}</p>
             )}
-            <Button type="submit" className="w-full" disabled={loading}>
+            <button type="submit" className="gpk-btn-primary w-full text-sm" disabled={loading}>
               {loading ? "Signing in..." : "Sign In"}
-            </Button>
+            </button>
           </form>
-          <p className="text-center text-sm text-muted-foreground mt-4">
+          <p className="text-center text-sm text-[#555] mt-4">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-primary underline">
+            <Link href="/signup" className="text-[#7ED957] font-bold hover:underline">
               Sign up
             </Link>
           </p>
-        </CardContent>
-      </Card>
+      </div>
     </div>
   );
 }

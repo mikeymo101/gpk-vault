@@ -64,9 +64,7 @@ export function CollectionView({
             <button
               key={f.value}
               onClick={() => setActiveFilter(f.value)}
-              className={`px-3 py-1.5 rounded-lg border-2 text-xs font-bold uppercase tracking-wide transition-all ${
-                isActive ? f.activeColor : "border-[#d4c0a8] text-[#6b5d4d]"
-              } ${count === 0 ? "opacity-40" : ""}`}
+              className={`gpk-chip ${isActive ? "gpk-chip-active" : ""} ${count === 0 ? "opacity-40" : ""}`}
             >
               {f.label} ({count})
             </button>
@@ -82,15 +80,15 @@ export function CollectionView({
       </div>
 
       {/* View mode toggle */}
-      <div className="flex gap-1 bg-[#e0d4c0] rounded-lg p-1 w-fit">
+      <div className="flex gap-1 border-2 border-[#111] rounded-xl p-1 w-fit bg-[#F2E8D5]">
         {views.map((v) => (
           <button
             key={v.value}
             onClick={() => setViewMode(v.value)}
-            className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${
+            className={`px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wide transition-all ${
               viewMode === v.value
-                ? "bg-white text-[#3a3025] shadow-sm"
-                : "text-[#8a7a6a] hover:text-[#3a3025]"
+                ? "bg-[#111] text-[#7ED957] shadow-[2px_2px_0_#7ED957]"
+                : "text-[#777] hover:text-[#111]"
             }`}
           >
             {v.label}
