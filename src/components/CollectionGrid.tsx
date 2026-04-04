@@ -27,9 +27,11 @@ function sortCards(cards: UserCardWithDetails[]) {
 export function CollectionGrid({
   cards,
   filter,
+  onCardClick,
 }: {
   cards: UserCardWithDetails[];
   filter: string;
+  onCardClick: (card: UserCardWithDetails) => void;
 }) {
   const sorted = sortCards(cards);
   const borderColor = filterColors[filter] ?? "border-green-500";
@@ -53,7 +55,9 @@ export function CollectionGrid({
             {setCards.map((uc) => (
               <div
                 key={uc.id}
-                className={`relative rounded-lg overflow-hidden border-2 ${borderColor}`}
+                onClick={() => onCardClick(uc)}
+                role="button"
+                className={`relative rounded-lg overflow-hidden border-2 ${borderColor} cursor-pointer hover:scale-105 transition-transform`}
               >
                 {uc.cards.image_url_a ? (
                   <img

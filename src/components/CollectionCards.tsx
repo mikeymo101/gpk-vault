@@ -20,9 +20,11 @@ function sortCards(cards: UserCardWithDetails[]) {
 export function CollectionCards({
   cards,
   filter,
+  onCardClick,
 }: {
   cards: UserCardWithDetails[];
   filter: string;
+  onCardClick: (card: UserCardWithDetails) => void;
 }) {
   const sorted = sortCards(cards);
 
@@ -38,7 +40,9 @@ export function CollectionCards({
         return (
           <div
             key={uc.id}
-            className="rounded-xl overflow-hidden border-2 border-[#d4c0a8] bg-gradient-to-b from-[#f4ece0] to-[#e8dcc8] shadow-sm"
+            onClick={() => onCardClick(uc)}
+            role="button"
+            className="gpk-card-tile cursor-pointer"
           >
             {/* Card image */}
             <div className="relative">

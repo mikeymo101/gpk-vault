@@ -5,6 +5,7 @@ import type { UserCardWithDetails } from "@/types";
 import { CollectionChecklist } from "@/components/CollectionChecklist";
 import { CollectionGrid } from "@/components/CollectionGrid";
 import { CollectionCards } from "@/components/CollectionCards";
+import { CardDetailModal } from "@/components/CardDetailModal";
 
 type FilterStatus = "have" | "want" | "for_trade" | "for_sale";
 type ViewMode = "checklist" | "grid" | "cards";
@@ -31,6 +32,7 @@ export function CollectionView({
 }) {
   const [activeFilter, setActiveFilter] = useState<FilterStatus>("have");
   const [viewMode, setViewMode] = useState<ViewMode>("checklist");
+  const [selectedCard, setSelectedCard] = useState<UserCardWithDetails | null>(null);
 
   const filtered = userCards.filter((uc) => uc.status === activeFilter);
 
@@ -106,15 +108,26 @@ export function CollectionView({
       ) : (
         <>
           {viewMode === "checklist" && (
-            <CollectionChecklist cards={filtered} filter={activeFilter} />
+            <CollectionChecklist cards={filtered} filter={activeFilter} onCardClick={setSelectedCard} />
           )}
           {viewMode === "grid" && (
-            <CollectionGrid cards={filtered} filter={activeFilter} />
+            <CollectionGrid cards={filtered} filter={activeFilter} onCardClick={setSelectedCard} />
           )}
           {viewMode === "cards" && (
-            <CollectionCards cards={filtered} filter={activeFilter} />
+            <CollectionCards cards={filtered} filter={activeFilter} onCardClick={setSelectedCard} />
           )}
         </>
+      )}
+
+      {/* Card detail modal */}
+      {selectedCard && (
+        <CardDetailModal
+          card={selectedCard.cards}
+          userEntries={userCards.filter((uc) => uc.card_id === selectedCard.card_id)}
+          userId={selectedCard.user_id}
+          open={!!selectedCard}
+          onClose={() => setSelectedCard(null)}
+        />
       )}
     </div>
   );

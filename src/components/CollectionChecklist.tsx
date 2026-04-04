@@ -21,9 +21,11 @@ function sortCards(cards: UserCardWithDetails[]) {
 export function CollectionChecklist({
   cards,
   filter,
+  onCardClick,
 }: {
   cards: UserCardWithDetails[];
   filter: string;
+  onCardClick: (card: UserCardWithDetails) => void;
 }) {
   const sorted = sortCards(cards);
 
@@ -72,7 +74,9 @@ export function CollectionChecklist({
                 {setCards.map((uc) => (
                   <div
                     key={uc.id}
-                    className="flex items-center py-1 px-1 text-sm hover:bg-amber-200/20 transition-colors"
+                    onClick={() => onCardClick(uc)}
+                    role="button"
+                    className="flex items-center py-1 px-1 text-sm hover:bg-amber-200/20 transition-colors cursor-pointer"
                   >
                     {/* Checkbox */}
                     <span className="w-3 h-3 rounded-sm border border-amber-600/40 bg-green-500/80 flex items-center justify-center mr-2 shrink-0">
