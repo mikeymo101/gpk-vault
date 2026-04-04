@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
+import { NeedsCardGrid } from "@/components/NeedsCardGrid";
 import Link from "next/link";
 import type { Set, Card as GPKCard, UserCard } from "@/types";
 
@@ -128,37 +129,15 @@ export default async function NeedsPage() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
-                    {cards
-                      .sort((a, b) => {
-                        const av = parseNum(a.number);
-                        const bv = parseNum(b.number);
-                        if (av.num !== bv.num) return av.num - bv.num;
-                        return av.variant.localeCompare(bv.variant);
-                      })
-                      .map((card) => (
-                        <div
-                          key={card.id}
-                          className="relative rounded-lg overflow-hidden border-2 border-red-300 opacity-70"
-                        >
-                          {card.image_url_a ? (
-                            <img
-                              src={card.image_url_a}
-                              alt={card.name_a}
-                              className="w-full aspect-[3/4] object-cover grayscale"
-                              loading="lazy"
-                            />
-                          ) : (
-                            <div className="w-full aspect-[3/4] bg-muted flex items-center justify-center text-[10px]">
-                              {card.number}
-                            </div>
-                          )}
-                          <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-[9px] px-1 py-0.5 text-center truncate">
-                            {card.number} {card.name_a}
-                          </div>
-                        </div>
-                      ))}
-                  </div>
+                  <NeedsCardGrid
+                    cards={cards.sort((a, b) => {
+                      const av = parseNum(a.number);
+                      const bv = parseNum(b.number);
+                      if (av.num !== bv.num) return av.num - bv.num;
+                      return av.variant.localeCompare(bv.variant);
+                    })}
+                    userId={user!.id}
+                  />
                 </div>
               );
             })}
