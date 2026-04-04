@@ -338,6 +338,9 @@ export function SetChecklist({
 
                     {/* Status buttons */}
                     {statusOptions.map((opt) => {
+                      // Only show Trade if the card is owned
+                      if (opt.value === "for_trade" && !isOwned) return null;
+
                       const isActive = statuses.has(opt.value);
                       const btnKey = card.id + opt.value;
 
@@ -443,6 +446,8 @@ export function SetChecklist({
                     {card.name_a}
                   </p>
                   {statusOptions.map((opt) => {
+                    if (opt.value === "for_trade" && !isHave) return null;
+
                     const isActive = statuses.has(opt.value);
                     const btnKey = card.id + opt.value;
 
