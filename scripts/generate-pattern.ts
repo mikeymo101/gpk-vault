@@ -4,96 +4,146 @@
 import sharp from "sharp";
 import path from "path";
 
-const TILE_SIZE = 900;
-const ICON_SIZE = 80;
-const OPACITY = 0.08; // 8% opacity — very subtle
+const TILE_SIZE = 1000;
+const ICON_SIZE = 120; // 50% bigger than before
+const OPACITY = 0.07; // 7% — very faint watermark
 const ICONS_DIR = path.resolve(__dirname, "../../icons");
 const OUT = path.resolve(__dirname, "../public/gpk-pattern-tile.png");
 
+// All 8 icons
 const stickers = [
   "sticker_ooze.png",
   "sticker_smile.png",
   "sticker_boom.png",
   "sticker_slime_v.png",
   "sticker_tentacles.png",
+  "Check.png",
+  "Trade.png",
+  "Badge.png",
 ];
 
-// Even grid with slight offsets for organic feel
-// 6 columns x 6 rows, staggered every other row
+// Seeded pseudo-random for deterministic but random-looking results
+function seededRandom(seed: number): () => number {
+  let s = seed;
+  return () => {
+    s = (s * 16807 + 0) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+
+// Generate evenly-distributed but random-looking placements using Poisson disk-like approach
 function generatePlacements(): [number, number, number][] {
-  const cols = 6;
-  const rows = 6;
-  const spacingX = TILE_SIZE / cols;
-  const spacingY = TILE_SIZE / rows;
-  const placements: [number, number, number][] = []; // x, y, stickerIdx
+  const rng = seededRandom(42);
+  const minDist = 140; // minimum distance between icons
+  const placements: [number, number, number][] = [];
+  const maxAttempts = 2000;
+  const targetCount = 40;
 
-  let stickerIdx = 0;
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
-      // Center of cell
-      let x = Math.round(col * spacingX + spacingX / 2);
-      let y = Math.round(row * spacingY + spacingY / 2);
+  for (let i = 0; i < maxAttempts && placements.length < targetCount; i++) {
+    const x = rng() * TILE_SIZE;
+    const y = rng() * TILE_SIZE;
 
-      // Stagger odd rows by half a cell
-      if (row % 2 === 1) {
-        x += Math.round(spacingX / 2);
-        if (x >= TILE_SIZE) x -= TILE_SIZE;
+    // Check distance to all existing placements (including wrapped versions)
+    let tooClose = false;
+    for (const [px, py] of placements) {
+      // Check with wrapping (toroidal distance)
+      let dx = Math.abs(x - px);
+      let dy = Math.abs(y - py);
+      if (dx > TILE_SIZE / 2) dx = TILE_SIZE - dx;
+      if (dy > TILE_SIZE / 2) dy = TILE_SIZE - dy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < minDist) {
+        tooClose = true;
+        break;
       }
+    }
 
-      // Small random-ish offset for organic feel (deterministic based on position)
-      const seed = (row * 7 + col * 13) % 20;
-      x += (seed - 10) * 1.5;
-      y += ((seed * 3) % 20 - 10) * 1.2;
-
-      placements.push([x, y, stickerIdx % stickers.length]);
-      stickerIdx++;
+    if (!tooClose) {
+      const stickerIdx = Math.floor(rng() * stickers.length);
+      placements.push([Math.round(x), Math.round(y), stickerIdx]);
     }
   }
 
   return placements;
 }
 
+// Actually reduce opacity by compositing with a semi-transparent mask
+async function fadeImage(buf: Buffer, opacity: number): Promise<Buffer> {
+  const meta = await sharp(buf).metadata();
+  const w = meta.width!;
+  const h = meta.height!;
+
+  // Create a semi-transparent overlay to multiply alpha
+  const mask = await sharp({
+    create: {
+      width: w,
+      height: h,
+      channels: 4,
+      background: { r: 255, g: 255, b: 255, alpha: opacity },
+    },
+  }).png().toBuffer();
+
+  // Use dest-in blend: keeps source pixels but uses mask's alpha
+  return sharp(buf)
+    .composite([{ input: mask, blend: "dest-in" }])
+    .png()
+    .toBuffer();
+}
+
 async function generate() {
   console.log("Generating seamless pattern tile...");
+  console.log(`Icons: ${stickers.length}, Size: ${ICON_SIZE}px, Opacity: ${OPACITY * 100}%`);
 
-  // Pre-load stickers
+  // Pre-load stickers at high res
   const stickerBuffers: Buffer[] = [];
   for (const name of stickers) {
     const buf = await sharp(path.join(ICONS_DIR, name))
       .resize(ICON_SIZE * 2, ICON_SIZE * 2, { fit: "inside" })
-      .ensureAlpha()
       .png()
       .toBuffer();
     stickerBuffers.push(buf);
   }
 
   const placements = generatePlacements();
+  console.log(`Placed ${placements.length} icons`);
+
   const composites: sharp.OverlayOptions[] = [];
 
-  // For seamless tiling, also render wrapped versions of edge icons
+  // For seamless tiling, render wrapped copies of edge icons
   const allPlacements: [number, number, number][] = [];
   for (const [x, y, idx] of placements) {
     allPlacements.push([x, y, idx]);
-    // Wrap edges
-    if (x < ICON_SIZE) allPlacements.push([x + TILE_SIZE, y, idx]);
-    if (x > TILE_SIZE - ICON_SIZE) allPlacements.push([x - TILE_SIZE, y, idx]);
-    if (y < ICON_SIZE) allPlacements.push([x, y + TILE_SIZE, idx]);
-    if (y > TILE_SIZE - ICON_SIZE) allPlacements.push([x, y - TILE_SIZE, idx]);
+    // Wrap all 4 edges + corners
+    for (const dx of [-TILE_SIZE, 0, TILE_SIZE]) {
+      for (const dy of [-TILE_SIZE, 0, TILE_SIZE]) {
+        if (dx === 0 && dy === 0) continue;
+        const nx = x + dx;
+        const ny = y + dy;
+        // Only include if it would overlap the tile
+        if (nx + ICON_SIZE > 0 && nx - ICON_SIZE < TILE_SIZE &&
+            ny + ICON_SIZE > 0 && ny - ICON_SIZE < TILE_SIZE) {
+          allPlacements.push([nx, ny, idx]);
+        }
+      }
+    }
   }
 
   for (const [x, y, stickerIdx] of allPlacements) {
-    // Vary size slightly per icon
-    const sizeSeed = (Math.round(x) * 3 + Math.round(y) * 7) % 10;
-    const size = Math.round(ICON_SIZE * (0.85 + sizeSeed * 0.03));
+    // Vary size slightly using position as seed
+    const sizeSeed = ((x * 7 + y * 13) % 20) / 100;
+    const size = Math.round(ICON_SIZE * (0.9 + sizeSeed));
 
+    // Resize and desaturate
     const resized = await sharp(stickerBuffers[stickerIdx])
       .resize(size, size, { fit: "inside" })
-      .modulate({ saturation: 0.25, brightness: 1.15 })
-      .ensureAlpha(OPACITY)
+      .modulate({ saturation: 0.2, brightness: 1.2 })
       .png()
       .toBuffer();
 
-    const meta = await sharp(resized).metadata();
+    // Apply real opacity reduction
+    const faded = await fadeImage(resized, OPACITY);
+
+    const meta = await sharp(faded).metadata();
     const w = meta.width ?? size;
     const h = meta.height ?? size;
 
@@ -111,14 +161,14 @@ async function generate() {
       const eH = Math.min(h - eT, TILE_SIZE - Math.max(0, top));
       if (eW <= 0 || eH <= 0) continue;
 
-      const cropped = await sharp(resized)
+      const cropped = await sharp(faded)
         .extract({ left: eL, top: eT, width: eW, height: eH })
         .png()
         .toBuffer();
 
       composites.push({ input: cropped, left: Math.max(0, left), top: Math.max(0, top) });
     } else {
-      composites.push({ input: resized, left, top });
+      composites.push({ input: faded, left, top });
     }
   }
 
@@ -134,7 +184,7 @@ async function generate() {
     .png()
     .toFile(OUT);
 
-  console.log(`✓ Saved ${OUT} (${TILE_SIZE}x${TILE_SIZE}, ${composites.length} icons)`);
+  console.log(`✓ Saved ${OUT} (${TILE_SIZE}x${TILE_SIZE}, ${composites.length} composites)`);
 }
 
 generate().catch(console.error);
