@@ -110,8 +110,10 @@ export type Database = {
           status: "have" | "want" | "for_sale" | "for_trade";
           quantity: number;
           condition: string | null;
+          grade: string | null;
           notes: string | null;
           price_cents: number | null;
+          price_paid_cents: number | null;
           created_at: string;
           updated_at: string;
         };

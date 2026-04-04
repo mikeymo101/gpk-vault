@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { CardDetailModal } from "@/components/CardDetailModal";
+import { InlineCardDetails } from "@/components/InlineCardDetails";
 import type { Card as GPKCard, UserCard } from "@/types";
 
 type CardStatus = UserCard["status"];
@@ -30,6 +31,7 @@ export function SetChecklist({
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
   const [view, setView] = useState<"list" | "grid">("list");
   const [selectedCard, setSelectedCard] = useState<GPKCard | null>(null);
+  const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
 
   async function toggleStatus(card: GPKCard, status: CardStatus) {
     const key = card.id + status;
@@ -206,48 +208,74 @@ export function SetChecklist({
             const statuses = new Set(entries.map((e) => e.status));
             const isOwned = statuses.has("have");
 
-            return (
-              <div
-                key={card.id}
-                className={`gpk-checklist-row flex items-center justify-between px-2 py-1.5 sm:px-3 sm:py-2 transition-colors border-b border-amber-200/20 dark:border-amber-800/10 ${
-                  isOwned ? "bg-green-50/50 dark:bg-green-950/10" : ""
-                }`}
-              >
-                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                  <button
-                  className="flex items-center gap-2 sm:gap-3 min-w-0 cursor-pointer"
-                  onClick={() => setSelectedCard(card)}
-                >
-                  {card.image_url_a ? (
-                    <img
-                      src={card.image_url_a}
-                      alt={card.name_a}
-                      className="w-10 h-14 sm:w-12 sm:h-16 object-cover rounded shrink-0"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="w-10 h-14 sm:w-12 sm:h-16 bg-muted rounded shrink-0 flex items-center justify-center text-xs text-muted-foreground">
-                      ?
-                    </div>
-                  )}
-                  <div className="min-w-0 text-left">
-                    <span className="text-xs font-mono text-muted-foreground">
-                      {card.number}
-                    </span>
-                    <p className="font-medium truncate text-sm sm:text-base">
-                      {card.name_a}
-                    </p>
-                  </div>
-                </button>
-                </div>
+            const haveEntry = entries.find((e) => e.status === "have");
+            const hasDetails = haveEntry && (haveEntry.condition || haveEntry.notes || haveEntry.grade);
+            const isExpanded = expandedCardId === card.id;
 
-                <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-                  {/* Quantity controls for "have" cards */}
-                  {(() => {
-                    const haveEntry = entries.find((e) => e.status === "have");
-                    if (!haveEntry) return null;
-                    return (
-                      <div className="flex items-center gap-0.5 mr-1 sm:mr-2">
+            return (
+              <div key={card.id} className="border-b border-amber-200/20 dark:border-amber-800/10">
+                <div
+                  className={`gpk-checklist-row flex items-center justify-between px-2 py-1.5 sm:px-3 sm:py-2 transition-colors ${
+                    isOwned ? "bg-green-50/50 dark:bg-green-950/10" : ""
+                  }`}
+                >
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                    <button
+                      className="flex items-center gap-2 sm:gap-3 min-w-0 cursor-pointer"
+                      onClick={() => setSelectedCard(card)}
+                    >
+                      {card.image_url_a ? (
+                        <img
+                          src={card.image_url_a}
+                          alt={card.name_a}
+                          className="w-10 h-14 sm:w-12 sm:h-16 object-cover rounded shrink-0"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-10 h-14 sm:w-12 sm:h-16 bg-muted rounded shrink-0 flex items-center justify-center text-xs text-muted-foreground">
+                          ?
+                        </div>
+                      )}
+                      <div className="min-w-0 text-left">
+                        <span className="text-xs font-mono text-muted-foreground">
+                          {card.number}
+                        </span>
+                        <p className="font-medium truncate text-sm sm:text-base">
+                          {card.name_a}
+                        </p>
+                        {/* Detail summary line */}
+                        {haveEntry && hasDetails && (
+                          <p className="text-[10px] text-[#8a7a6a] truncate">
+                            {[
+                              haveEntry.condition,
+                              haveEntry.grade ? `Grade: ${haveEntry.grade}` : null,
+                              haveEntry.price_paid_cents ? `Paid: $${(haveEntry.price_paid_cents / 100).toFixed(2)}` : null,
+                            ].filter(Boolean).join(" · ")}
+                          </p>
+                        )}
+                      </div>
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+                    {/* Detail indicator / expand button for "have" cards */}
+                    {haveEntry && (
+                      <button
+                        onClick={() => setExpandedCardId(isExpanded ? null : card.id)}
+                        className={`h-6 w-6 rounded-full flex items-center justify-center text-[10px] transition-colors mr-0.5 ${
+                          hasDetails
+                            ? "bg-green-600 text-white"
+                            : "bg-[#d4c0a8] text-[#6b5d4d] hover:bg-[#c4b098]"
+                        }`}
+                        title={hasDetails ? "Edit details" : "Add details"}
+                      >
+                        {hasDetails ? "✓" : "…"}
+                      </button>
+                    )}
+
+                    {/* Quantity controls */}
+                    {haveEntry && (
+                      <div className="flex items-center gap-0.5 mr-0.5 sm:mr-1">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -270,28 +298,40 @@ export function SetChecklist({
                           +
                         </Button>
                       </div>
-                    );
-                  })()}
-                  {statusOptions.map((opt) => {
-                    const isActive = statuses.has(opt.value);
-                    const btnKey = card.id + opt.value;
+                    )}
 
-                    return (
-                      <Button
-                        key={opt.value}
-                        variant={isActive ? "default" : "outline"}
-                        size="sm"
-                        className="h-7 px-1.5 sm:px-2 text-xs"
-                        disabled={loadingKey === btnKey || isPending}
-                        onClick={() => toggleStatus(card, opt.value)}
-                      >
-                        {isActive && "✓ "}
-                        <span className="hidden sm:inline">{opt.label}</span>
-                        <span className="sm:hidden">{opt.label[0]}</span>
-                      </Button>
-                    );
-                  })}
+                    {/* Status buttons */}
+                    {statusOptions.map((opt) => {
+                      const isActive = statuses.has(opt.value);
+                      const btnKey = card.id + opt.value;
+
+                      return (
+                        <Button
+                          key={opt.value}
+                          variant={isActive ? "default" : "outline"}
+                          size="sm"
+                          className="h-7 px-1.5 sm:px-2 text-xs"
+                          disabled={loadingKey === btnKey || isPending}
+                          onClick={() => toggleStatus(card, opt.value)}
+                        >
+                          {isActive && "✓ "}
+                          <span className="hidden sm:inline">{opt.label}</span>
+                          <span className="sm:hidden">{opt.label[0]}</span>
+                        </Button>
+                      );
+                    })}
+                  </div>
                 </div>
+
+                {/* Inline detail panel */}
+                {isExpanded && haveEntry && (
+                  <div className="px-2 sm:px-3 pb-2">
+                    <InlineCardDetails
+                      entry={haveEntry}
+                      onClose={() => setExpandedCardId(null)}
+                    />
+                  </div>
+                )}
               </div>
             );
           })}
