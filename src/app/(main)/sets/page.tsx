@@ -1,31 +1,29 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import type { Set, Card as GPKCard } from "@/types";
 
-// Map set names to their iconic cover card numbers
+// Iconic cover cards per set (first card as fallback)
 const setCoverCards: Record<string, string> = {
-  "Original Series 1": "8a",   // Adam Bomb
-  "Original Series 2": "52a",  // Dirty Harry
-  "Original Series 3": "88a",  // Dinah Saur
-  "Original Series 4": "137a", // Max Axe
-  "Original Series 5": "185a", // Fran Furter
-  "Original Series 6": "222a", // Troy Toy
-  "Original Series 7": "260a", // Adam Boom
-  "Original Series 8": "309a", // Heartless Hal
-  "Original Series 9": "355a", // Beasty Boyd
-  "Original Series 10": "399a", // Dirty Flora
-  "Original Series 11": "438a", // Hallie Ween
-  "Original Series 12": "480a", // Robby Rubbish
-  "Original Series 13": "520a", // Sprinkling Jose
-  "Original Series 14": "549a", // Shannon Cannon
-  "Original Series 15": "600a", // Vendo-Matt
+  "Original Series 1": "8a",
+  "Original Series 2": "52a",
+  "Original Series 3": "88a",
+  "Original Series 4": "137a",
+  "Original Series 5": "185a",
+  "Original Series 6": "222a",
+  "Original Series 7": "260a",
+  "Original Series 8": "309a",
+  "Original Series 9": "355a",
+  "Original Series 10": "399a",
+  "Original Series 11": "438a",
+  "Original Series 12": "480a",
+  "Original Series 13": "520a",
+  "Original Series 14": "549a",
+  "Original Series 15": "600a",
+  "All New Series 4": "40a",  // Adam Bomb
 };
 
 export default async function SetsPage() {
   const supabase = await createClient();
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -57,7 +55,21 @@ export default async function SetsPage() {
     }
   }
 
-  // Get user's card counts per set
+  // Also get first card per set as fallback cover
+  const { data: firstCardsData } = await supabase
+    .from("cards")
+    .select("set_id, number, image_url_a")
+    .like("number", "%a")
+    .order("number", { ascending: true });
+
+  const firstCardMap = new Map<string, string>();
+  for (const card of (firstCardsData ?? []) as unknown as GPKCard[]) {
+    if (card.image_url_a && !firstCardMap.has(card.set_id)) {
+      firstCardMap.set(card.set_id, card.image_url_a);
+    }
+  }
+
+  // Get user's have counts per set
   const { data: userCardsData } = await supabase
     .from("user_cards")
     .select("card_id, status, cards(set_id)")
@@ -72,95 +84,155 @@ export default async function SetsPage() {
     }
   }
 
+  // Group sets by series
+  const seriesGroups = new Map<string, Set[]>();
+  for (const set of sets) {
+    const series = set.series;
+    if (!seriesGroups.has(series)) seriesGroups.set(series, []);
+    seriesGroups.get(series)!.push(set);
+  }
+
+  // Define series order and colors
+  const seriesConfig: Record<string, { color: string; accent: string }> = {
+    "Original Series": { color: "#7ED957", accent: "#4CAF50" },
+    "All New Series": { color: "#4CC9F0", accent: "#2196F3" },
+    "Flashback Series": { color: "#FFE600", accent: "#FF9800" },
+    "Brand New Series": { color: "#FF4FA3", accent: "#E91E63" },
+    "Chrome Series": { color: "#C0C0C0", accent: "#9E9E9E" },
+    "Sapphire Edition": { color: "#1E88E5", accent: "#1565C0" },
+  };
+
+  function getCover(set: Set): string | undefined {
+    const coverNum = setCoverCards[set.name];
+    if (coverNum) {
+      const url = coverMap.get(set.id + coverNum);
+      if (url) return url;
+    }
+    return firstCardMap.get(set.id);
+  }
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div>
         <h1 className="gpk-heading text-2xl">Browse Sets</h1>
-        <p className="gpk-muted text-sm">Select a set to view its checklist</p>
+        <p className="gpk-muted text-sm">
+          {sets.length} sets &middot; Select a series to explore
+        </p>
       </div>
 
       {sets.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <p className="text-lg font-medium">No sets loaded yet</p>
-          </CardContent>
-        </Card>
+        <div className="gpk-panel p-8 text-center">
+          <p className="gpk-heading text-lg">No sets loaded yet</p>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sets.map((set) => {
-            const have = haveCounts[set.id] ?? 0;
-            const pct =
-              set.total_cards > 0
-                ? Math.round((have / set.total_cards) * 100)
-                : 0;
-            const coverNum = setCoverCards[set.name];
-            const coverUrl = coverNum
-              ? coverMap.get(set.id + coverNum)
-              : undefined;
+        <div className="space-y-6">
+          {Array.from(seriesGroups.entries()).map(([seriesName, seriesSets]) => {
+            const config = seriesConfig[seriesName] ?? { color: "#7ED957", accent: "#4CAF50" };
+            const totalCards = seriesSets.reduce((sum, s) => sum + s.total_cards, 0);
+            const totalHave = seriesSets.reduce((sum, s) => sum + (haveCounts[s.id] ?? 0), 0);
+            const overallPct = totalCards > 0 ? Math.round((totalHave / totalCards) * 100) : 0;
 
             return (
-              <Link key={set.id} href={`/sets/${set.id}`}>
-                <Card className="hover:border-[#c4a090] transition-all cursor-pointer h-full overflow-hidden group bg-gradient-to-b from-[#f4ece0] to-[#e8dcc8] border-[#d4c0a8]">
-                  <div className="flex">
-                    {/* Cover card image */}
-                    <div className="w-24 sm:w-28 shrink-0 bg-muted relative overflow-hidden">
-                      {coverUrl ? (
-                        <img
-                          src={coverUrl}
-                          alt={set.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-muted-foreground">
-                          {set.name.replace("Original Series ", "OS")}
-                        </div>
-                      )}
-                    </div>
-
-                    <CardContent className="p-4 flex-1 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-start justify-between gap-2">
-                          <p className="font-bold">{set.name}</p>
-                          <Badge variant="outline" className="shrink-0 text-xs">
-                            {set.year}
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {set.release_date ?? set.series} &middot; {set.total_cards} cards
-                        </p>
-                        {set.artists && (
-                          <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
-                            {set.artists}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Progress bar */}
-                      <div className="mt-3 space-y-1">
-                        <div className="flex justify-between text-[11px] text-muted-foreground">
-                          <span>
-                            {have} / {set.total_cards}
-                          </span>
-                          {pct === 100 ? (
-                            <span className="text-green-600 font-bold">COMPLETE</span>
-                          ) : (
-                            <span>{pct}%</span>
-                          )}
-                        </div>
-                        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                          <div
-                            className={`h-full transition-all duration-300 ${
-                              pct === 100 ? "bg-green-500" : "bg-primary"
-                            }`}
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                      </div>
-                    </CardContent>
+              <div key={seriesName} className="space-y-3">
+                {/* Series header */}
+                <div
+                  className="flex items-center justify-between px-4 py-3 rounded-xl border-3 border-[#111]"
+                  style={{
+                    background: `linear-gradient(135deg, ${config.color}22, ${config.color}44)`,
+                    borderColor: config.accent,
+                    boxShadow: `3px 3px 0 ${config.accent}`,
+                  }}
+                >
+                  <div>
+                    <h2 className="font-black text-lg text-[#111]">{seriesName}</h2>
+                    <p className="text-xs text-[#555]">
+                      {seriesSets.length} set{seriesSets.length !== 1 ? "s" : ""} &middot;{" "}
+                      {totalCards} cards &middot;{" "}
+                      {seriesSets[0].year}
+                      {seriesSets[seriesSets.length - 1].year !== seriesSets[0].year
+                        ? `–${seriesSets[seriesSets.length - 1].year}`
+                        : ""}
+                    </p>
                   </div>
-                </Card>
-              </Link>
+                  <div className="text-right">
+                    <p className="text-sm font-black text-[#111]">{overallPct}%</p>
+                    <div className="w-20 h-1.5 bg-[#111]/10 rounded-full overflow-hidden mt-0.5">
+                      <div
+                        className="h-full rounded-full transition-all"
+                        style={{ width: `${overallPct}%`, background: config.color }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sets grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                  {seriesSets.map((set) => {
+                    const have = haveCounts[set.id] ?? 0;
+                    const pct = set.total_cards > 0 ? Math.round((have / set.total_cards) * 100) : 0;
+                    const cover = getCover(set);
+
+                    return (
+                      <Link key={set.id} href={`/sets/${set.id}`}>
+                        <div className="gpk-card-tile group cursor-pointer h-full">
+                          {/* Cover image */}
+                          <div className="relative h-[120px] overflow-hidden bg-[#e8dcc8]">
+                            {cover ? (
+                              <img
+                                src={cover}
+                                alt={set.name}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                loading="lazy"
+                              />
+                            ) : (
+                              <div
+                                className="w-full h-full flex items-center justify-center text-3xl font-black"
+                                style={{ color: config.color + "66" }}
+                              >
+                                {set.name.replace(/^(Original |All New |Flashback |Brand New |Chrome )Series /, "").replace("Edition ", "")}
+                              </div>
+                            )}
+                            {/* Year badge */}
+                            <div className="absolute top-1.5 right-1.5 bg-[#111]/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+                              {set.year}
+                            </div>
+                            {/* Complete badge */}
+                            {pct === 100 && (
+                              <div
+                                className="absolute top-1.5 left-1.5 text-[#111] text-[9px] font-black px-1.5 py-0.5 rounded"
+                                style={{ background: config.color }}
+                              >
+                                COMPLETE
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Info */}
+                          <div className="p-2.5">
+                            <p className="font-bold text-xs text-[#111] leading-tight truncate">
+                              {set.name}
+                            </p>
+                            <p className="text-[10px] text-[#777] mt-0.5">
+                              {set.total_cards} cards
+                            </p>
+
+                            {/* Progress */}
+                            <div className="mt-1.5 flex items-center gap-1.5">
+                              <div className="flex-1 h-1 bg-[#111]/10 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full rounded-full transition-all"
+                                  style={{ width: `${pct}%`, background: config.color }}
+                                />
+                              </div>
+                              <span className="text-[9px] font-bold text-[#555]">{pct}%</span>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
             );
           })}
         </div>
