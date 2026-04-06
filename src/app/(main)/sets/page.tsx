@@ -35,7 +35,12 @@ export default async function SetsPage() {
     .select("*")
     .order("year", { ascending: true });
 
-  const sets = (data ?? []) as unknown as Set[];
+  const sets = ((data ?? []) as unknown as Set[]).sort((a, b) => {
+    if (a.year !== b.year) return a.year - b.year;
+    const numA = parseInt(a.name.match(/\d+/)?.[0] ?? "0");
+    const numB = parseInt(b.name.match(/\d+/)?.[0] ?? "0");
+    return numA - numB;
+  });
 
   // Get cover card images
   const coverNumbers = Object.values(setCoverCards);
